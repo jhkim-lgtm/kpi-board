@@ -121,6 +121,8 @@
   .track.fast .trail{opacity:.7}
   .tierlab b{color:var(--ac)!important}
 
+  .views{font-size:15px;color:var(--ink2)}
+  .views b{color:var(--ink);font-weight:800}
   .stats{display:flex;gap:14px;flex-wrap:wrap;font-size:14.5px;color:var(--ink2)}
   .line2{display:flex;gap:16px;flex-wrap:wrap;align-items:baseline}
   .stats .s b{color:var(--ink);font-weight:750}
@@ -189,14 +191,14 @@ const HIST_CSV=`https://docs.google.com/spreadsheets/d/${PUB}/gviz/tq?tqx=out:cs
 
 const KPI = [
  {id:"rr",   sec:"agency", ac:"#b08d3e", em:"🚗", client:"ROLLS-ROYCE", name:"인스타그램",      handle:"@rollsroycecarsseoul",       goal:30000, kind:"daily", idx:0, feed:"rollsroycecarsseoul"},
- {id:"plus", sec:"agency", ac:"#c4614a", em:"💸", client:"한화 PLUS",   name:"인스타그램",      handle:"@pluskr_official",          goal:10000, kind:"daily", idx:3, feed:"pluskr_official"},
+ {id:"plus", sec:"agency", ac:"#c4614a", em:"💸", client:"한화 PLUS",   name:"인스타그램",      handle:"@pluskr_official",          goal:10000, kind:"daily", idx:3, feed:"pluskr_official", vk:"views_pluskr_official"},
  {id:"kef",  sec:"agency", ac:"#4e86c8", em:"🔊", client:"KEF",         name:"인스타그램",      handle:"@kef.korea",                goal:15000, kind:"daily", idx:2, feed:"kef.korea"},
  {id:"prov", sec:"agency", ac:"#b08d3e", em:"🔑", client:"ROLLS-ROYCE", name:"프로비넌스",      handle:"@rollsroyceseoulprovenance", goal:5000,  kind:"daily", idx:1, feed:"rollsroyceseoulprovenance"},
  {id:"kakao",sec:"agency", ac:"#b08d3e", em:"💬", client:"ROLLS-ROYCE", name:"카카오톡 구독자", handle:"카카오 채널",                 goal:2000,  kind:"monthly", row:"카카오톡", feed:"rr_kakao"},
  {id:"yt",   sec:"agency", ac:"#b08d3e", em:"📺", client:"ROLLS-ROYCE", name:"유튜브 구독자",   handle:"구독자",                     goal:2000,  kind:"monthly", row:"유튜브",   feed:"rr_youtube"},
- {id:"kr",   sec:"own", ac:"#b08d3e", em:"🇰🇷", svg:'<svg viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#fff"/><circle cx="18" cy="12" r="6" fill="#cd2e3a"/><path d="M12 12a3 3 0 0 1 6 0a3 3 0 0 0 6 0a6 6 0 0 1-12 0z" fill="#0047a0"/><g fill="#1a1a1a"><g transform="translate(6.7,5.8) rotate(-56)"><rect x="-3" y="-2.5" width="6" height="1.1"/><rect x="-3" y="-.55" width="6" height="1.1"/><rect x="-3" y="1.4" width="6" height="1.1"/></g><g transform="translate(29.3,18.2) rotate(-56)"><rect x="-3" y="-2.5" width="2.6" height="1.1"/><rect x=".4" y="-2.5" width="2.6" height="1.1"/><rect x="-3" y="-.55" width="2.6" height="1.1"/><rect x=".4" y="-.55" width="2.6" height="1.1"/><rect x="-3" y="1.4" width="2.6" height="1.1"/><rect x=".4" y="1.4" width="2.6" height="1.1"/></g><g transform="translate(29.3,5.8) rotate(56)"><rect x="-3" y="-2.5" width="2.6" height="1.1"/><rect x=".4" y="-2.5" width="2.6" height="1.1"/><rect x="-3" y="-.55" width="6" height="1.1"/><rect x="-3" y="1.4" width="2.6" height="1.1"/><rect x=".4" y="1.4" width="2.6" height="1.1"/></g><g transform="translate(6.7,18.2) rotate(56)"><rect x="-3" y="-2.5" width="6" height="1.1"/><rect x="-3" y="-.55" width="2.6" height="1.1"/><rect x=".4" y="-.55" width="2.6" height="1.1"/><rect x="-3" y="1.4" width="6" height="1.1"/></g></g></svg>', client:"1%CLUB",       name:"코리아",   handle:"@1club.kr",     kind:"own", own:0, feed:"1club.kr"},
- {id:"mfk",  sec:"own", ac:"#4e86c8", em:"🌏", client:"MYFIRSTKOREA", name:"글로벌",   handle:"@myfirstkorea", kind:"own", own:1, feed:"myfirstkorea"},
- {id:"jp",   sec:"own", ac:"#c4614a", em:"🇯🇵", svg:'<svg viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#fff"/><circle cx="18" cy="12" r="7" fill="#bc002d"/></svg>', client:"1%CLUB JP",    name:"재팬",     handle:"@1club.jp",     kind:"own", own:2, feed:"1club.jp"},
+ {id:"kr",   sec:"own", ac:"#b08d3e", em:"🇰🇷", svg:'<svg viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#fff"/><circle cx="18" cy="12" r="6" fill="#cd2e3a"/><path d="M12 12a3 3 0 0 1 6 0a3 3 0 0 0 6 0a6 6 0 0 1-12 0z" fill="#0047a0"/><g fill="#1a1a1a"><g transform="translate(6.7,5.8) rotate(-56)"><rect x="-3" y="-2.5" width="6" height="1.1"/><rect x="-3" y="-.55" width="6" height="1.1"/><rect x="-3" y="1.4" width="6" height="1.1"/></g><g transform="translate(29.3,18.2) rotate(-56)"><rect x="-3" y="-2.5" width="2.6" height="1.1"/><rect x=".4" y="-2.5" width="2.6" height="1.1"/><rect x="-3" y="-.55" width="2.6" height="1.1"/><rect x=".4" y="-.55" width="2.6" height="1.1"/><rect x="-3" y="1.4" width="2.6" height="1.1"/><rect x=".4" y="1.4" width="2.6" height="1.1"/></g><g transform="translate(29.3,5.8) rotate(56)"><rect x="-3" y="-2.5" width="2.6" height="1.1"/><rect x=".4" y="-2.5" width="2.6" height="1.1"/><rect x="-3" y="-.55" width="6" height="1.1"/><rect x="-3" y="1.4" width="2.6" height="1.1"/><rect x=".4" y="1.4" width="2.6" height="1.1"/></g><g transform="translate(6.7,18.2) rotate(56)"><rect x="-3" y="-2.5" width="6" height="1.1"/><rect x="-3" y="-.55" width="2.6" height="1.1"/><rect x=".4" y="-.55" width="2.6" height="1.1"/><rect x="-3" y="1.4" width="6" height="1.1"/></g></g></svg>', client:"1%CLUB",       name:"코리아",   handle:"@1club.kr",     kind:"own", own:0, feed:"1club.kr", vk:"views_1club.kr"},
+ {id:"mfk",  sec:"own", ac:"#4e86c8", em:"🌏", client:"MYFIRSTKOREA", name:"글로벌",   handle:"@myfirstkorea", kind:"own", own:1, feed:"myfirstkorea", vk:"views_myfirstkorea"},
+ {id:"jp",   sec:"own", ac:"#c4614a", em:"🇯🇵", svg:'<svg viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#fff"/><circle cx="18" cy="12" r="7" fill="#bc002d"/></svg>', client:"1%CLUB JP",    name:"재팬",     handle:"@1club.jp",     kind:"own", own:2, feed:"1club.jp", vk:"views_1club.jp"},
  {id:"xkr",  sec:"own", ac:"#c4614a", em:"📕", client:"1%CLUB",       name:"샤오홍슈", handle:"小红书 · 1club.kr",     kind:"static", val:74,   asOf:"2026-07-28", feed:"xhs_1club"},
  {id:"xmfk", sec:"own", ac:"#c4614a", em:"🏮", client:"MYFIRSTKOREA", name:"샤오홍슈", handle:"小红书 · MyFirstKorea", kind:"static", val:4255, asOf:"2026-07-28", feed:"xhs_mfk"},
 ];
@@ -218,6 +220,7 @@ const BAKED_MONTHLY={
   "카카오톡":{months:[1203,1228,1230,1233,1237], current:1242, asOf:"2026-07-28"},
   "유튜브":  {months:[702,705,707,710,718],     current:719,  asOf:"2026-07-28"},
 };
+const BAKED_VIEWS={kr:30131832, mfk:20787613, jp:4105907, plus:3318919}; // IG 30일 조회수 실측 2026-07-28
 
 /* ── state ── */
 const S={}; let syncAt=null;
@@ -270,6 +273,7 @@ function loadBaked(){
     else if(k.kind==="monthly"){ const b=BAKED_MONTHLY[k.row]; applyMonthly(k,b.months,b.current,b.asOf); }
     else S[k.id]={series:null,last:k.val,lastDate:k.asOf,rate:0,baseTs:Date.now()};
   });
+  KPI.forEach(k=>{ if(k.vk&&BAKED_VIEWS[k.id]) S[k.id].views=BAKED_VIEWS[k.id]; });
 }
 
 /* ── public feed fetch (gviz CSV · CORS OK) ── */
@@ -313,6 +317,7 @@ async function refresh(){
         if(m) m.textContent="일 1회 자동 집계 · "+f.date+" 기준";
       }
     });
+    KPI.forEach(k=>{ if(k.vk&&feed[k.vk]&&feed[k.vk].last) S[k.id].views=feed[k.vk].last; });
     syncAt=Date.now(); hideBanner();
     document.getElementById("liveTxt").textContent="LIVE";
     renderStatic(); syncLabel();
@@ -324,6 +329,7 @@ async function refresh(){
 
 /* ── build cards ── */
 const fmt=n=>Math.floor(n).toLocaleString("ko-KR");
+const fmtViews=v=> v>=1e8? (v/1e8).toFixed(1).replace(/\.0$/,"")+"억" : v>=1e4? Math.round(v/1e4).toLocaleString("ko-KR")+"만" : v.toLocaleString("ko-KR");
 function card(k,i){
   const el=document.createElement("div");
   el.className="card"; el.id="c_"+k.id; el.style.setProperty("--ac",k.ac);
@@ -340,6 +346,7 @@ function card(k,i){
     <div class="badge" style="--d:${(i%6)*0.7}s">${k.svg||`<span>${k.em}</span>`}</div>
     <div class="eyebrow"><span class="chip">${k.client}</span> ${k.name} <span class="handle">${k.handle}</span></div>
     <div class="bignum num"><span id="n_${k.id}">—</span>${goalHtml}</div>
+    ${k.vk?`<div class="views num" id="v_${k.id}"></div>`:""}
     ${barHtml}${bottom}`;
   document.getElementById(k.sec==="agency"?"gridAgency":"gridOwn").appendChild(el);
 }
@@ -394,6 +401,8 @@ function renderStatic(){
   KPI.forEach(k=>{
     const st=S[k.id];
     if(k.kind==="static") return;
+    if(k.vk){ const ve=document.getElementById("v_"+k.id);
+      if(ve) ve.innerHTML = st.views? `👁 월간 조회수 <b>${fmtViews(st.views)}</b>` : ""; }
     if(k.goal){
       const pct=Math.min(100,st.last/k.goal*100);
       document.getElementById("b_"+k.id).style.width=pct.toFixed(1)+"%";
