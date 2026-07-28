@@ -50,35 +50,24 @@
   #banner.show{display:block}
 
   .sect{display:flex;align-items:center;gap:14px;margin:22px 0 12px;flex-wrap:wrap}
-  .sect h2{font-size:15px;font-weight:800;letter-spacing:.02em}
+  .sect h2{font-size:17px;font-weight:800;letter-spacing:.02em}
   .sect .tag{font-size:11px;font-weight:700;color:var(--blue);background:#3d95f61a;border:1px solid #3d95f633;
     padding:3px 10px;border-radius:14px}
   .sect .sub{font-size:12px;color:var(--ink3)}
   .sect .grow{flex:1}
-  .sect .sum{font-size:13px;color:var(--ink2)}
+  .sect .sum{font-size:14.5px;color:var(--ink2)}
   .sect .sum b{color:var(--ink);font-weight:800}
   .sect .sum .up{color:var(--good)}
 
-  .total{background:linear-gradient(135deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--line);
-    border-radius:20px;padding:14px 20px;margin-bottom:14px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;
-    box-shadow:0 10px 30px -18px #000}
-  .total .tl{font-size:12px;color:var(--ink2)}
-  .total .tv{font-size:clamp(19px,2vw,26px);font-weight:800}
-  .total .tv small{font-size:.55em;color:var(--ink3);font-weight:600}
-  .tbar{flex:1;min-width:200px;height:12px;background:#262830;border-radius:6px;overflow:hidden}
-  .tbar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--gold),var(--gold2));
-    transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
-  .today-all{font-size:13px;color:var(--good)}
-  .today-all b{font-size:16px;font-weight:800}
 
-  .grid{display:grid;gap:14px;grid-template-columns:repeat(3,1fr)}
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(3,1fr)}
   .grid.own{grid-template-columns:repeat(auto-fit,minmax(235px,1fr))}
   @media(max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:640px){.grid{grid-template-columns:1fr}}
 
   .card{
     background:linear-gradient(160deg,var(--card2) 0%,var(--card) 55%);
-    border:1px solid var(--line);border-radius:24px;padding:18px 20px 16px;
+    border:1px solid var(--line);border-radius:24px;padding:16px 20px 14px;
     position:relative;display:flex;flex-direction:column;gap:10px;
     box-shadow:0 16px 40px -24px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.045);
     transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
@@ -90,37 +79,37 @@
   .card.near::after{content:"";position:absolute;inset:0;border-radius:24px;pointer-events:none;
     box-shadow:inset 0 0 40px -14px var(--ac);opacity:.5}
 
-  .badge{position:absolute;top:14px;right:16px;width:54px;height:54px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;font-size:29px;
+  .badge{position:absolute;top:14px;right:16px;width:58px;height:58px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:31px;
     background:radial-gradient(circle at 32% 26%, color-mix(in srgb,var(--ac) 55%,#fff) 0%, color-mix(in srgb,var(--ac) 45%,#000) 68%, color-mix(in srgb,var(--ac) 25%,#000) 100%);
     box-shadow:0 10px 20px -8px color-mix(in srgb,var(--ac) 65%,#000), inset 0 -5px 10px rgba(0,0,0,.4), inset 0 4px 7px rgba(255,255,255,.32);
     animation:bob 5.5s ease-in-out infinite;animation-delay:var(--d,0s)}
   .badge span{filter:drop-shadow(0 3px 4px rgba(0,0,0,.45))}
   @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-7px) rotate(3deg)}}
 
-  .eyebrow{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2);padding-right:60px;flex-wrap:wrap}
-  .chip{display:inline-block;padding:2.5px 9px;border-radius:20px;font-size:10.5px;font-weight:800;letter-spacing:.05em;
+  .eyebrow{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);padding-right:66px;flex-wrap:wrap}
+  .chip{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:800;letter-spacing:.05em;
     color:#0e0f13;background:var(--ac)}
-  .handle{color:var(--ink3);font-size:11px}
+  .handle{color:var(--ink3);font-size:12px}
 
-  .bignum{font-size:clamp(29px,2.9vw,42px);font-weight:800;line-height:1.05;letter-spacing:-.02em;
+  .bignum{font-size:clamp(34px,3vw,58px);font-weight:800;line-height:1.05;letter-spacing:-.02em;
     display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
   .bignum .goal{font-size:.4em;color:var(--ink3);font-weight:600}
   .bignum.tick{animation:pop .55s ease}
   @keyframes pop{0%{text-shadow:0 0 22px var(--ac)}100%{text-shadow:none}}
 
-  .pbar{height:10px;background:#262830;border-radius:5px;overflow:hidden}
+  .pbar{height:13px;background:#262830;border-radius:5px;overflow:hidden}
   .pbar i{display:block;height:100%;border-radius:5px;
     background:linear-gradient(90deg,color-mix(in srgb,var(--ac) 75%,#000),var(--ac));
     transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
-  .prow{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2)}
+  .prow{display:flex;justify-content:space-between;font-size:13.5px;color:var(--ink2)}
   .prow .pct{font-weight:800;color:var(--ink)}
 
-  .track{height:32px;border-radius:12px;background:#131419;border:1px solid #22242b;
+  .track{height:34px;border-radius:12px;background:#131419;border:1px solid #22242b;
     position:relative;overflow:hidden}
   .track::before{content:"";position:absolute;left:8px;right:8px;bottom:6px;height:0;
     border-bottom:2px dashed #2b2d36}
-  .runner{position:absolute;top:3px;left:100%;font-size:19px;line-height:1;
+  .runner{position:absolute;top:4px;left:100%;font-size:21px;line-height:1;
     filter:drop-shadow(0 2px 3px rgba(0,0,0,.5));
     animation:run linear infinite;animation-duration:var(--dur,6s)}
   .runner.flip{transform:scaleX(-1)}
@@ -131,19 +120,20 @@
   .track.fast .trail{opacity:.7}
   .tierlab b{color:var(--ac)!important}
 
-  .stats{display:flex;gap:13px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2)}
+  .stats{display:flex;gap:14px;flex-wrap:wrap;font-size:14.5px;color:var(--ink2)}
+  .line2{display:flex;gap:16px;flex-wrap:wrap;align-items:baseline}
   .stats .s b{color:var(--ink);font-weight:750}
   .up{color:var(--good)} .flat{color:var(--ink3)} .down{color:var(--ink2)}
-  .today{font-size:13px;color:var(--good);min-height:18px}
+  .today{font-size:14.5px;color:var(--good)}
   .today b{font-weight:800}
   .today.zero{color:var(--ink3)}
-  .eta{font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px;align-self:flex-start;
+  .eta{font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;align-self:flex-start;
     padding:4px 11px;border-radius:14px;border:1px solid var(--line);background:#0e0f1366}
   .eta.ok{color:var(--good);border-color:#4fc47f33}
   .eta.warn{color:var(--warn);border-color:#e0a83f33}
   .eta.bad{color:var(--bad);border-color:#e06b5733}
 
-  .spark{width:100%;height:50px;display:block;cursor:crosshair}
+  .spark{width:100%;height:44px;display:block;cursor:crosshair}
   .sparkwrap{position:relative}
   .tip{position:absolute;pointer-events:none;background:#0a0b0e;border:1px solid var(--line);border-radius:8px;
     padding:4px 9px;font-size:11px;color:var(--ink2);white-space:nowrap;display:none;transform:translate(-50%,-115%)}
@@ -182,13 +172,6 @@
 
 <div class="sect"><h2>운영대행 KPI</h2><span class="tag">목표 계약 지표</span>
   <div class="grow"></div></div>
-<div class="total">
-  <div><div class="tl">전체 목표 달성률 · 6개 KPI</div>
-    <div class="tv num"><span id="totCur">—</span> <small>/ <span id="totGoal">—</span></small></div></div>
-  <div class="tbar"><i id="totBar" style="width:0%"></i></div>
-  <div class="tv num" id="totPct">—%</div>
-  <div class="today-all num" id="totToday"></div>
-</div>
 <div class="grid" id="gridAgency"></div>
 
 <footer>
@@ -349,8 +332,7 @@ function card(k,i){
   const bottom = k.kind==="static"
     ? `<div class="manual">일 1회 자동 집계 · ${k.asOf} 기준</div>`
     : `<div class="track" id="tk_${k.id}"><span class="runner" id="rn_${k.id}">🏃</span><span class="trail">〰〰</span></div>
-       <div class="stats num" id="s_${k.id}"></div>
-       <div class="today num" id="t_${k.id}"></div>
+       <div class="line2"><div class="stats num" id="s_${k.id}"></div><div class="today num" id="t_${k.id}"></div></div>
        ${k.goal?`<div class="eta" id="e_${k.id}"></div>`:""}
        <div class="sparkwrap"><canvas class="spark" id="sp_${k.id}"></canvas><div class="tip" id="tp_${k.id}"></div></div>`;
   el.innerHTML=`
@@ -365,7 +347,7 @@ KPI.forEach(card);
 function drawSpark(k){
   const st=S[k.id]; if(!st||!st.series) return;
   const cv=document.getElementById("sp_"+k.id); if(!cv) return;
-  const w=cv.clientWidth||280,h=50,dpr=window.devicePixelRatio||1;
+  const w=cv.clientWidth||280,h=44,dpr=window.devicePixelRatio||1;
   cv.width=w*dpr; cv.height=h*dpr;
   const x=cv.getContext("2d"); x.scale(dpr,dpr); x.clearRect(0,0,w,h);
   const pts=st.series; if(pts.length<2) return;
@@ -449,12 +431,6 @@ function renderStatic(){
     drawSpark(k);
   });
   document.getElementById("dataDate").textContent=latest+" 10:00 KST";
-  const ag=KPI.filter(k=>k.sec==="agency");
-  const cur=ag.reduce((a,k)=>a+S[k.id].last,0), goal=ag.reduce((a,k)=>a+k.goal,0);
-  document.getElementById("totCur").textContent=fmt(cur);
-  document.getElementById("totGoal").textContent=fmt(goal);
-  document.getElementById("totPct").textContent=(cur/goal*100).toFixed(1)+"%";
-  document.getElementById("totBar").style.width=(cur/goal*100).toFixed(1)+"%";
   const own=KPI.filter(k=>k.sec==="own");
   const osum=own.reduce((a,k)=>a+S[k.id].last,0);
   const orate=own.reduce((a,k)=>a+Math.max(0,S[k.id].rate||0),0);
@@ -464,7 +440,7 @@ function renderStatic(){
 /* ── live ticker ── */
 const shown={};
 function tick(){
-  const now=Date.now(); let totToday=0,any=false;
+  const now=Date.now();
   KPI.forEach(k=>{
     const st=S[k.id]; if(!st) return;
     const el=document.getElementById("n_"+k.id);
@@ -476,11 +452,10 @@ function tick(){
       shown[k.id]=iv; el.textContent=iv.toLocaleString("ko-KR");
     }
     const td=document.getElementById("t_"+k.id);
-    if(st.rate>0.2){ if(k.sec==="agency"){any=true; totToday+=gain;}
+    if(st.rate>0.2){
       td.className="today num"; td.innerHTML=`오늘 예상 <b>+${gain.toFixed(2)}</b>`;
     } else { td.className="today num zero"; td.textContent=st.rate<-0.5?"최근 감소 추세 — 실측 기준 유지":""; }
   });
-  document.getElementById("totToday").innerHTML=any?`집계 후 전체 <b>+${totToday.toFixed(1)}</b>`:"";
 }
 setInterval(tick,200);
 
