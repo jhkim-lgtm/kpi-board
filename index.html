@@ -116,12 +116,20 @@
   .prow{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2)}
   .prow .pct{font-weight:800;color:var(--ink)}
 
-  .pace{height:5px;border-radius:3px;background:#22242b;position:relative;overflow:hidden}
-  .pace i{position:absolute;inset:0;border-radius:3px;
-    background:repeating-linear-gradient(90deg,transparent 0 13px,var(--ac) 13px 21px);
-    opacity:.8;animation:flow linear infinite;animation-duration:var(--dur,4s)}
-  .pace.stop i{animation:none;opacity:.15}
-  @keyframes flow{from{transform:translateX(-21px)}to{transform:translateX(0)}}
+  .track{height:32px;border-radius:12px;background:#131419;border:1px solid #22242b;
+    position:relative;overflow:hidden}
+  .track::before{content:"";position:absolute;left:8px;right:8px;bottom:6px;height:0;
+    border-bottom:2px dashed #2b2d36}
+  .runner{position:absolute;top:3px;left:100%;font-size:19px;line-height:1;
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,.5));
+    animation:run linear infinite;animation-duration:var(--dur,6s)}
+  .runner.flip{transform:scaleX(-1)}
+  @keyframes run{from{left:calc(100% + 6px)}to{left:-34px}}
+  .track.stop .runner{animation:none;left:12px;opacity:.4}
+  .track .trail{position:absolute;top:12px;left:100%;font-size:10px;color:var(--ac);opacity:0;
+    animation:run linear infinite;animation-duration:var(--dur,6s);animation-delay:.12s}
+  .track.fast .trail{opacity:.7}
+  .tierlab b{color:var(--ac)!important}
 
   .stats{display:flex;gap:13px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2)}
   .stats .s b{color:var(--ink);font-weight:750}
@@ -340,7 +348,7 @@ function card(k,i){
     <div class="prow num"><span class="pct" id="p_${k.id}">—%</span><span id="r_${k.id}"></span></div>`:"";
   const bottom = k.kind==="static"
     ? `<div class="manual">일 1회 자동 집계 · ${k.asOf} 기준</div>`
-    : `<div class="pace" id="pc_${k.id}"><i></i></div>
+    : `<div class="track" id="tk_${k.id}"><span class="runner" id="rn_${k.id}">🏃</span><span class="trail">〰〰</span></div>
        <div class="stats num" id="s_${k.id}"></div>
        <div class="today num" id="t_${k.id}"></div>
        ${k.goal?`<div class="eta" id="e_${k.id}"></div>`:""}
@@ -380,6 +388,17 @@ function drawSpark(k){
   };
   cv.onmouseleave=()=>{const t=document.getElementById("tp_"+k.id); if(t)t.style.display="none"};
 }
+function speedTier(r){
+  if(r<=0.2) return {em:"🧍",label:"정지",move:false,flip:false};
+  if(r<3)    return {em:"🐢",label:"거북이",move:true,flip:false};
+  if(r<10)   return {em:"🚶",label:"걷기",move:true,flip:false};
+  if(r<30)   return {em:"🏃",label:"달리기",move:true,flip:false};
+  if(r<80)   return {em:"🚴",label:"자전거",move:true,flip:false};
+  if(r<150)  return {em:"🚗",label:"자동차",move:true,flip:false};
+  if(r<300)  return {em:"✈️",label:"비행기",move:true,flip:true};
+  if(r<600)  return {em:"🚀",label:"제트기",move:true,flip:true};
+  return {em:"⚡",label:"빛의 속도",move:true,flip:false};
+}
 function humanEvery(sec){
   if(sec<90) return Math.round(sec)+"초";
   if(sec<5400) return Math.round(sec/60)+"분";
@@ -414,11 +433,18 @@ function renderStatic(){
     const cls=rv>0.5?"up":(rv<-0.5?"down":"flat"), arrow=rv>0.5?"▲":(rv<-0.5?"▼":"―");
     let extra="";
     if(st.d30!=null&&k.kind!=="monthly") extra=`<span class="s" style="color:var(--ink3)">30일 ${st.d30>=0?"+":""}${st.d30.toLocaleString()}</span>`;
+    const tier=speedTier(r);
     s.innerHTML=`<span class="s ${cls}">${arrow} <b>${rv>0?"+":""}${Math.round(rv).toLocaleString()}</b>/${unit}</span>`
+      +`<span class="s tierlab">${tier.em} <b>${tier.label}</b></span>`
       +(r>0.2?`<span class="s" style="color:var(--ink3)">${humanEvery(86400/r)}마다 +1</span>`:"")+extra;
-    const pc=document.getElementById("pc_"+k.id);
-    if(r>0.5){ pc.classList.remove("stop"); pc.querySelector("i").style.setProperty("--dur",Math.max(.5,Math.min(9,180/r))+"s"); }
-    else pc.classList.add("stop");
+    const tk=document.getElementById("tk_"+k.id), rn=document.getElementById("rn_"+k.id);
+    rn.textContent=tier.em; rn.classList.toggle("flip",tier.flip);
+    if(tier.move){
+      tk.classList.remove("stop");
+      const dur=Math.max(2.2,Math.min(11,50/Math.sqrt(Math.max(r,0.3))));
+      tk.style.setProperty("--dur",dur.toFixed(2)+"s");
+      tk.classList.toggle("fast",r>=150);
+    } else { tk.classList.add("stop"); tk.classList.remove("fast"); }
     if(st.lastDate>latest&&k.kind!=="monthly") latest=st.lastDate;
     drawSpark(k);
   });
