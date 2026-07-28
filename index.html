@@ -84,6 +84,7 @@
     background:radial-gradient(circle at 32% 26%, color-mix(in srgb,var(--ac) 55%,#fff) 0%, color-mix(in srgb,var(--ac) 45%,#000) 68%, color-mix(in srgb,var(--ac) 25%,#000) 100%);
     box-shadow:0 10px 20px -8px color-mix(in srgb,var(--ac) 65%,#000), inset 0 -5px 10px rgba(0,0,0,.4), inset 0 4px 7px rgba(255,255,255,.32);
     animation:bob 5.5s ease-in-out infinite;animation-delay:var(--d,0s)}
+  .badge svg{width:33px;height:auto;border-radius:4px;box-shadow:0 2px 5px rgba(0,0,0,.5)}
   .badge span{filter:drop-shadow(0 3px 4px rgba(0,0,0,.45))}
   @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-7px) rotate(3deg)}}
 
@@ -193,9 +194,9 @@ const KPI = [
  {id:"prov", sec:"agency", ac:"#b08d3e", em:"🔑", client:"ROLLS-ROYCE", name:"프로비넌스",      handle:"@rollsroyceseoulprovenance", goal:5000,  kind:"daily", idx:1, feed:"rollsroyceseoulprovenance"},
  {id:"kakao",sec:"agency", ac:"#b08d3e", em:"💬", client:"ROLLS-ROYCE", name:"카카오톡 구독자", handle:"카카오 채널",                 goal:2000,  kind:"monthly", row:"카카오톡", feed:"rr_kakao"},
  {id:"yt",   sec:"agency", ac:"#b08d3e", em:"📺", client:"ROLLS-ROYCE", name:"유튜브 구독자",   handle:"구독자",                     goal:2000,  kind:"monthly", row:"유튜브",   feed:"rr_youtube"},
- {id:"kr",   sec:"own", ac:"#b08d3e", em:"🇰🇷", client:"1%CLUB",       name:"코리아",   handle:"@1club.kr",     kind:"own", own:0, feed:"1club.kr"},
+ {id:"kr",   sec:"own", ac:"#b08d3e", em:"🇰🇷", svg:'<svg viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#fff"/><circle cx="18" cy="12" r="6" fill="#cd2e3a"/><path d="M12 12a3 3 0 0 1 6 0a3 3 0 0 0 6 0a6 6 0 0 1-12 0z" fill="#0047a0"/><g fill="#1a1a1a"><g transform="translate(6.7,5.8) rotate(-56)"><rect x="-3" y="-2.5" width="6" height="1.1"/><rect x="-3" y="-.55" width="6" height="1.1"/><rect x="-3" y="1.4" width="6" height="1.1"/></g><g transform="translate(29.3,18.2) rotate(-56)"><rect x="-3" y="-2.5" width="2.6" height="1.1"/><rect x=".4" y="-2.5" width="2.6" height="1.1"/><rect x="-3" y="-.55" width="2.6" height="1.1"/><rect x=".4" y="-.55" width="2.6" height="1.1"/><rect x="-3" y="1.4" width="2.6" height="1.1"/><rect x=".4" y="1.4" width="2.6" height="1.1"/></g><g transform="translate(29.3,5.8) rotate(56)"><rect x="-3" y="-2.5" width="2.6" height="1.1"/><rect x=".4" y="-2.5" width="2.6" height="1.1"/><rect x="-3" y="-.55" width="6" height="1.1"/><rect x="-3" y="1.4" width="2.6" height="1.1"/><rect x=".4" y="1.4" width="2.6" height="1.1"/></g><g transform="translate(6.7,18.2) rotate(56)"><rect x="-3" y="-2.5" width="6" height="1.1"/><rect x="-3" y="-.55" width="2.6" height="1.1"/><rect x=".4" y="-.55" width="2.6" height="1.1"/><rect x="-3" y="1.4" width="6" height="1.1"/></g></g></svg>', client:"1%CLUB",       name:"코리아",   handle:"@1club.kr",     kind:"own", own:0, feed:"1club.kr"},
  {id:"mfk",  sec:"own", ac:"#4e86c8", em:"🌏", client:"MYFIRSTKOREA", name:"글로벌",   handle:"@myfirstkorea", kind:"own", own:1, feed:"myfirstkorea"},
- {id:"jp",   sec:"own", ac:"#c4614a", em:"🇯🇵", client:"1%CLUB JP",    name:"재팬",     handle:"@1club.jp",     kind:"own", own:2, feed:"1club.jp"},
+ {id:"jp",   sec:"own", ac:"#c4614a", em:"🇯🇵", svg:'<svg viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#fff"/><circle cx="18" cy="12" r="7" fill="#bc002d"/></svg>', client:"1%CLUB JP",    name:"재팬",     handle:"@1club.jp",     kind:"own", own:2, feed:"1club.jp"},
  {id:"xkr",  sec:"own", ac:"#c4614a", em:"📕", client:"1%CLUB",       name:"샤오홍슈", handle:"小红书 · 1club.kr",     kind:"static", val:74,   asOf:"2026-07-28", feed:"xhs_1club"},
  {id:"xmfk", sec:"own", ac:"#c4614a", em:"🏮", client:"MYFIRSTKOREA", name:"샤오홍슈", handle:"小红书 · MyFirstKorea", kind:"static", val:4255, asOf:"2026-07-28", feed:"xhs_mfk"},
 ];
@@ -336,7 +337,7 @@ function card(k,i){
        ${k.goal?`<div class="eta" id="e_${k.id}"></div>`:""}
        <div class="sparkwrap"><canvas class="spark" id="sp_${k.id}"></canvas><div class="tip" id="tp_${k.id}"></div></div>`;
   el.innerHTML=`
-    <div class="badge" style="--d:${(i%6)*0.7}s"><span>${k.em}</span></div>
+    <div class="badge" style="--d:${(i%6)*0.7}s">${k.svg||`<span>${k.em}</span>`}</div>
     <div class="eyebrow"><span class="chip">${k.client}</span> ${k.name} <span class="handle">${k.handle}</span></div>
     <div class="bignum num"><span id="n_${k.id}">—</span>${goalHtml}</div>
     ${barHtml}${bottom}`;
