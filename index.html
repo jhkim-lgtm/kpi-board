@@ -179,7 +179,7 @@
 <div class="meta">
   <span>데이터 기준 <b id="dataDate">2026-07-28 10:00</b></span>
   <span>피드 동기화 <b id="syncAgo">연결 중…</b></span>
-  <span>출처 <b>1club_data · 롤스로이스 월간시트 · 샤오홍슈</b> (매일 10:10 자동 반영)</span>
+  <span>출처 <b>1club_data · 롤스로이스 월간시트 · 샤오홍슈</b> (15분 간격 실시간 집계)</span>
 </div>
 <div id="banner"></div>
 
@@ -270,6 +270,9 @@ function applySeries(k, pts, feedRow){
   }
   st.d30 = feedRow&&feedRow.w30!=null ? feedRow.last-feedRow.w30 : null;
   st.baseTs=new Date(last.d+"T10:00:00+09:00").getTime();
+  st.day0 = feedRow&&feedRow.d0!=null ? feedRow.d0 : null;
+  st.tsStr = feedRow&&feedRow.ts ? feedRow.ts : null;
+  if(st.tsStr){ const t=Date.parse(st.tsStr.replace(" ","T")+":00+09:00"); if(t) st.baseTs=t; }
 }
 function applyMonthly(k,months,current,asOf){
   const st=S[k.id]=S[k.id]||{};
@@ -313,7 +316,8 @@ async function refresh(){
     ]);
     const feed={};
     parseCsv(ft).slice(1).forEach(r=>{ if(r[0]) feed[r[0]]={date:r[1],last:+String(r[2]).replace(/,/g,"")||null,
-      w7:+String(r[3]).replace(/,/g,"")||null, w30:+String(r[4]).replace(/,/g,"")||null}; });
+      w7:+String(r[3]).replace(/,/g,"")||null, w30:+String(r[4]).replace(/,/g,"")||null,
+      ts:(r[6]||"").trim()||null, d0:+String(r[7]||"").replace(/,/g,"")||null}; });
     const hist={};
     if(ht) parseCsv(ht).slice(1).forEach(r=>{ if(r[1]&&/^\d{4}-\d{2}-\d{2}$/.test(r[0]))
       (hist[r[1]]=hist[r[1]]||[]).push({d:r[0],v:+String(r[2]).replace(/,/g,"")||0}); });
@@ -479,7 +483,8 @@ function renderStatic(){
     if(st.lastDate>latest&&k.kind!=="monthly") latest=st.lastDate;
     drawSpark(k);
   });
-  document.getElementById("dataDate").textContent=latest+" 10:00 KST";
+  const lts=KPI.map(k=>S[k.id]&&S[k.id].tsStr).filter(Boolean).sort().pop();
+  document.getElementById("dataDate").textContent=lts? lts+" KST (실시간)" : latest+" 10:00 KST";
   const own=KPI.filter(k=>k.sec==="own");
   const osum=own.reduce((a,k)=>a+S[k.id].last,0);
   const orate=own.reduce((a,k)=>a+Math.max(0,S[k.id].rate||0),0);
@@ -501,8 +506,12 @@ function tick(){
       if(shown[k.id]!=null&&iv>shown[k.id]){ const b=el.parentElement; b.classList.remove("tick"); void b.offsetWidth; b.classList.add("tick"); }
       shown[k.id]=iv; el.textContent=iv.toLocaleString("ko-KR");
     }
-    const td=document.getElementById("t_"+k.id);
-    if(st.rate>0.2){
+    const td=document.getElementById("t_"+k.id); if(!td) return;
+    if(st.day0!=null){
+      const tg=(st.last-st.day0)+gain;
+      td.className="today num"+(tg>0.005?"":" zero");
+      td.innerHTML=`오늘 ${tg>=0?"+":""}<b>${tg.toFixed(2)}</b> <span style="color:var(--ink3);font-size:.85em">실측</span>`;
+    } else if(st.rate>0.2){
       td.className="today num"; td.innerHTML=`오늘 예상 <b>+${gain.toFixed(2)}</b>`;
     } else { td.className="today num zero"; td.textContent=st.rate<-0.5?"최근 감소 추세 — 실측 기준 유지":""; }
   });
@@ -521,7 +530,7 @@ function syncLabel(){
   if(!syncAt){ el.textContent="스냅샷 모드"; return; }
   const m=Math.round((Date.now()-syncAt)/60000);
   el.textContent=m<1?"방금":m+"분 전";
-  lt.classList.toggle("stale",m>90);
+  lt.classList.toggle("stale",m>40);
 }
 setInterval(syncLabel,30000);
 
@@ -531,7 +540,7 @@ function hideBanner(){ banner.classList.remove("show"); }
 
 /* ── boot ── */
 loadBaked(); renderStatic(); tick();
-refresh(); setInterval(refresh, 15*60*1000);
+refresh(); setInterval(refresh, 5*60*1000);
 /* ── fit-to-screen: 어떤 모니터 비율에서도 전체 정보가 잘리지 않게 자동 축척 ── */
 function fitScreen(){
   const m=document.querySelector("main"); if(!m) return;
