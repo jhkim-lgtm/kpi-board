@@ -165,6 +165,22 @@
     .bignum.tick{animation:none}
     .card:hover{transform:none}
   }
+  /* ── dense (≥1200px) — 대형 화면 압축 모드: 여백 최소화 후 화면에 꽉 차게 균일 확대 ── */
+  body.dense{padding:12px}
+  body.dense .orb{display:none}
+  body.dense .meta{margin:2px 0 10px}
+  body.dense .sect{margin:12px 0 8px}
+  body.dense .grid{gap:12px}
+  body.dense .grid,body.dense .grid.own{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  body.dense .card{padding:12px 16px 11px;gap:7px;border-radius:18px}
+  body.dense .card:hover{transform:none;box-shadow:0 16px 40px -24px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.045)}
+  body.dense .badge{width:48px;height:48px;font-size:25px;top:11px;right:13px}
+  body.dense .badge svg{width:27px}
+  body.dense .eyebrow{padding-right:54px}
+  body.dense .spark{height:44px}
+  body.dense .track{height:28px}
+  body.dense .runner{font-size:18px;top:3px}
+  body.dense .subrow{padding:6px 12px}
   /* ── mobile (≤768px) — 데스크톱 레이아웃 불변, 폰 가독성 보강 ── */
   @media(max-width:768px){
     .orb{display:none}                          /* 대형 blur 배경 = 모바일 스크롤 잔렉 방지 */
@@ -403,7 +419,7 @@ KPI.forEach(card);
 function drawSpark(k){
   const st=S[k.id]; if(!st||!st.series) return;
   const cv=document.getElementById("sp_"+k.id); if(!cv) return;
-  const w=cv.clientWidth||280,h=60,dpr=window.devicePixelRatio||1;
+  const w=cv.clientWidth||280,h=cv.clientHeight||60,dpr=window.devicePixelRatio||1;
   cv.width=w*dpr; cv.height=h*dpr;
   const x=cv.getContext("2d"); x.scale(dpr,dpr); x.clearRect(0,0,w,h);
   const pts=st.series; if(pts.length<2) return;
@@ -557,28 +573,29 @@ function hideBanner(){ banner.classList.remove("show"); }
 /* ── boot ── */
 loadBaked(); renderStatic(); tick();
 refresh(); setInterval(refresh, 5*60*1000);
-/* ── fit-to-screen: 어떤 모니터 비율에서도 전체 정보가 잘리지 않게 자동 축척 ── */
+/* ── fit-to-screen: 전체 정보가 잘리지 않는 한도에서 화면에 꽉 차게 균일 확대/축소 ──
+   dense 모드로 여백을 압축한 뒤, "레이아웃 폭 = 화면폭/s"로 두고 배율 s를 이진 탐색.
+   s>1 = 확대(대형 TV에서 각 카드가 크게), s<1 = 축소(노트북에서 전체 표시). 비율은 항상 유지. */
 function fitScreen(){
   const m=document.querySelector("main"); if(!m) return;
-  if(window.innerWidth<1200){ document.body.classList.remove("fit"); m.style.transform=""; m.style.width=""; KPI.forEach(drawSpark); return; }
-  const availH=window.innerHeight-40;
-  let s=1;
-  for(let i=0;i<3;i++){
-    m.style.width=s<1?(100/s)+"%":"";
-    m.style.transform="";
-    const ns=Math.min(1, availH/m.scrollHeight);
-    if(Math.abs(ns-s)<0.005){ s=ns; break; }
-    s=ns;
+  if(window.innerWidth<1200){
+    document.body.classList.remove("fit","dense");
+    m.style.transform=""; m.style.width=""; m.style.marginTop="";
+    KPI.forEach(drawSpark); return;
   }
-  if(s<0.999){
-    m.style.width=(100/s)+"%";
-    m.style.transformOrigin="top left";
-    m.style.transform=`scale(${s})`;
-    document.body.classList.add("fit");
-  } else {
-    m.style.width=""; m.style.transform="";
-    document.body.classList.remove("fit");
+  document.body.classList.add("dense");
+  const pad=12, availW=window.innerWidth-pad*2, availH=window.innerHeight-pad*2;
+  const fits=s=>{ m.style.width=(availW/s)+"px"; return m.scrollHeight*s<=availH; };
+  let lo=0.35, hi=2.4;
+  if(fits(lo)){
+    for(let i=0;i<12;i++){ const mid=(lo+hi)/2; if(fits(mid)) lo=mid; else hi=mid; }
   }
+  const s=lo;
+  m.style.width=(availW/s)+"px";
+  m.style.transformOrigin="top left";
+  m.style.transform=`scale(${s})`;
+  m.style.marginTop=Math.max(0,(availH-m.scrollHeight*s)/2)+"px";
+  document.body.classList.add("fit");
   KPI.forEach(drawSpark);
 }
 window.addEventListener("resize",()=>{ clearTimeout(window.__ft); window.__ft=setTimeout(fitScreen,120); });
