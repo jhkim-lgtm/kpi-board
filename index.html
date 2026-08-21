@@ -137,9 +137,16 @@
   .card.hype{border-color:#c9a84e88}
   .card.hype::after{content:"";position:absolute;inset:0;border-radius:24px;pointer-events:none;
     box-shadow:inset 0 0 44px -12px #e8c56b;opacity:.5;animation:milepulse 1.6s ease-in-out infinite}
-  .stats{display:flex;gap:14px;flex-wrap:wrap;font-size:14.5px;color:var(--ink2)}
+  .stats{display:flex;gap:14px;flex-wrap:wrap;font-size:14.5px;color:var(--ink2);align-items:baseline}
   .line2{display:flex;gap:16px;flex-wrap:wrap;align-items:baseline}
   .stats .s b{color:var(--ink);font-weight:750}
+  /* 전일 증감 = 카드의 두 번째 히어로 숫자 */
+  .stats .d1{font-size:29px;font-weight:800;letter-spacing:-.01em;display:inline-flex;align-items:baseline;gap:6px}
+  .stats .d1 i{font-style:normal;font-size:.5em;transform:translateY(-1px)}
+  .stats .d1 b{color:inherit;font-weight:800;font-size:inherit}
+  .stats .d1 small{font-size:13px;font-weight:600;color:var(--ink2)}
+  .stats .d1.up{text-shadow:0 0 16px #4fc47f55}
+  .stats .d1.down{color:var(--bad);text-shadow:0 0 16px #e06b5744}
   .up{color:var(--good)} .flat{color:var(--ink3)} .down{color:var(--ink2)}
   .today{font-size:14.5px;color:var(--good)}
   .today b{font-weight:800}
@@ -416,16 +423,20 @@ function card(k,i){
 }
 KPI.forEach(card);
 
+const SPARKS={};
+const REDUCED=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
 function drawSpark(k){
   const st=S[k.id]; if(!st||!st.series) return;
   const cv=document.getElementById("sp_"+k.id); if(!cv) return;
   const w=cv.clientWidth||280,h=cv.clientHeight||60,dpr=window.devicePixelRatio||1;
   cv.width=w*dpr; cv.height=h*dpr;
-  const x=cv.getContext("2d"); x.scale(dpr,dpr); x.clearRect(0,0,w,h);
   const pts=st.series; if(pts.length<2) return;
   const vs=pts.map(p=>p.v),mn=Math.min(...vs),mx=Math.max(...vs),sp=(mx-mn)||1;
   const X=i=>3+(w-6)*i/(pts.length-1), Y=v=>4+(h-9)*(1-(v-mn)/sp);
   const col=k.ac;
+  /* 정적 곡선은 오프스크린에 1회 렌더 → 애니메이션 루프가 리빌+펄스만 담당 */
+  const off=document.createElement("canvas"); off.width=w*dpr; off.height=h*dpr;
+  const x=off.getContext("2d"); x.scale(dpr,dpr);
   const path=()=>{ x.beginPath(); x.moveTo(X(0),Y(pts[0].v));
     for(let i=1;i<pts.length;i++){ const xc=(X(i-1)+X(i))/2, yc=(Y(pts[i-1].v)+Y(pts[i].v))/2; x.quadraticCurveTo(X(i-1),Y(pts[i-1].v),xc,yc); }
     x.lineTo(X(pts.length-1),Y(pts[pts.length-1].v)); };
@@ -435,8 +446,17 @@ function drawSpark(k){
   x.save(); x.shadowColor=col; x.shadowBlur=9;
   path(); x.strokeStyle=col; x.lineWidth=2.5; x.lineJoin="round"; x.stroke(); x.restore();
   const li=pts.length-1;
-  x.beginPath(); x.arc(X(li),Y(pts[li].v),4,0,7); x.fillStyle=col; x.fill();
-  x.beginPath(); x.arc(X(li),Y(pts[li].v),4,0,7); x.strokeStyle="#0e0f13"; x.lineWidth=2; x.stroke();
+  const prev=SPARKS[k.id];
+  const sameData=prev&&prev.key===st.lastDate+"/"+pts.length;
+  SPARKS[k.id]={cv,off,dpr,col,ex:X(li),ey:Y(pts[li].v),
+    start:(sameData&&prev.start)||performance.now(),key:st.lastDate+"/"+pts.length};
+  if(REDUCED){ /* 모션 최소화: 전체 곡선 + 고정 점만 */
+    const c=cv.getContext("2d"); c.drawImage(off,0,0);
+    c.setTransform(dpr,0,0,dpr,0,0);
+    c.beginPath(); c.arc(X(li),Y(pts[li].v),4,0,7); c.fillStyle=col; c.fill();
+    c.strokeStyle="#0e0f13"; c.lineWidth=2; c.stroke();
+    delete SPARKS[k.id];
+  }
   cv.onmousemove=ev=>{
     const r=cv.getBoundingClientRect();
     const i=Math.max(0,Math.min(pts.length-1,Math.round((ev.clientX-r.left-4)/((w-8)/(pts.length-1)))));
@@ -446,6 +466,32 @@ function drawSpark(k){
   };
   cv.onmouseleave=()=>{const t=document.getElementById("tp_"+k.id); if(t)t.style.display="none"};
 }
+/* ── spark 애니메이션 루프: 좌→우 리빌 + 최신점 펄스 핑 ── */
+function sparkLoop(now){
+  for(const id in SPARKS){
+    const a=SPARKS[id]; if(!a.cv.isConnected){ delete SPARKS[id]; continue; }
+    const g=a.cv.getContext("2d");
+    g.setTransform(1,0,0,1,0,0);
+    g.clearRect(0,0,a.cv.width,a.cv.height);
+    const prog=Math.min(1,(now-a.start)/1200);
+    const e=1-Math.pow(1-prog,3);
+    const cw=Math.max(1,Math.round(a.cv.width*e));
+    g.drawImage(a.off,0,0,cw,a.cv.height,0,0,cw,a.cv.height);
+    if(prog>=1){
+      g.setTransform(a.dpr,0,0,a.dpr,0,0);
+      const t=((now-a.start)%1700)/1700;
+      g.beginPath(); g.arc(a.ex,a.ey,4+t*12,0,7);
+      g.strokeStyle=a.col; g.globalAlpha=(1-t)*.5; g.lineWidth=1.6; g.stroke();
+      g.globalAlpha=1;
+      const r=3.6+Math.sin(now/280)*.9;
+      g.save(); g.shadowColor=a.col; g.shadowBlur=10;
+      g.beginPath(); g.arc(a.ex,a.ey,r,0,7); g.fillStyle=a.col; g.fill(); g.restore();
+      g.beginPath(); g.arc(a.ex,a.ey,r,0,7); g.strokeStyle="#0e0f13"; g.lineWidth=2; g.stroke();
+    }
+  }
+  requestAnimationFrame(sparkLoop);
+}
+if(!REDUCED) requestAnimationFrame(sparkLoop);
 function speedTier(r){
   if(r<=0.2) return {em:"🧍",label:"정지",move:false,flip:false};
   if(r<3)    return {em:"🐢",label:"거북이",move:true,flip:false};
@@ -507,8 +553,8 @@ function renderStatic(){
     let extra="";
     if(st.d30!=null&&k.kind!=="monthly") extra=`<span class="s" style="color:var(--ink3)">30일 ${st.d30>=0?"+":""}${st.d30.toLocaleString()}</span>`;
     const tier=speedTier(r);
-    const period=k.kind==="monthly"?"/월":" 전일";
-    s.innerHTML=`<span class="s ${cls}">${arrow} <b>${rv>0?"+":""}${Math.round(rv).toLocaleString()}</b>${period}</span>`
+    const period=k.kind==="monthly"?"이번 달":"전일";
+    s.innerHTML=`<span class="s d1 ${cls}"><i>${arrow}</i><b>${rv>0?"+":""}${Math.round(rv).toLocaleString()}</b><small>${period}</small></span>`
       +`<span class="s tierlab">${tier.em} <b>${tier.label}</b></span>`
       +(k.kind!=="monthly"?`<span class="s" style="color:var(--ink3)">7일 평균 ${r>0?"+":""}${Math.round(r).toLocaleString()}/일</span>`:"")+extra;
     const tk=document.getElementById("tk_"+k.id), rn=document.getElementById("rn_"+k.id);
@@ -528,7 +574,7 @@ function renderStatic(){
   const od1=own.reduce((a,k)=>a+(S[k.id].d1||0),0);
   const ocls=od1>0?"up":(od1<0?"down":"flat"), oarrow=od1>0?"▲":(od1<0?"▼":"―");
   document.getElementById("ownSum").innerHTML=`<b>${fmt(osum)}</b> 팔로워 <span class="${ocls}">${oarrow} ${od1>0?"+":""}${od1.toLocaleString()} 전일</span>`;
-  if(typeof fitScreen==="function"){ clearTimeout(window.__ft); window.__ft=setTimeout(fitScreen,60); }
+  scheduleFit();
 }
 
 /* ── live ticker ── */
@@ -567,8 +613,9 @@ function syncLabel(){
 setInterval(syncLabel,30000);
 
 const banner=document.getElementById("banner");
-function showBanner(h){ banner.innerHTML=h; banner.classList.add("show"); }
-function hideBanner(){ banner.classList.remove("show"); }
+function scheduleFit(){ if(typeof fitScreen==="function"){ clearTimeout(window.__ft); window.__ft=setTimeout(fitScreen,60); } }
+function showBanner(h){ banner.innerHTML=h; banner.classList.add("show"); scheduleFit(); }
+function hideBanner(){ banner.classList.remove("show"); scheduleFit(); }
 
 /* ── boot ── */
 loadBaked(); renderStatic(); tick();
@@ -585,7 +632,7 @@ function fitScreen(){
   }
   document.body.classList.add("dense");
   const pad=12, availW=window.innerWidth-pad*2, availH=window.innerHeight-pad*2;
-  const fits=s=>{ m.style.width=(availW/s)+"px"; return m.scrollHeight*s<=availH; };
+  const fits=s=>{ m.style.width=(availW/s)+"px"; return m.scrollHeight*s<=availH-4; };
   let lo=0.35, hi=2.4;
   if(fits(lo)){
     for(let i=0;i<12;i++){ const mid=(lo+hi)/2; if(fits(mid)) lo=mid; else hi=mid; }
@@ -600,6 +647,7 @@ function fitScreen(){
 }
 window.addEventListener("resize",()=>{ clearTimeout(window.__ft); window.__ft=setTimeout(fitScreen,120); });
 setTimeout(fitScreen,80);
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(scheduleFit);
 </script>
 </body>
 </html>
