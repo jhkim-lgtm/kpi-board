@@ -106,19 +106,19 @@
   .prow{display:flex;justify-content:space-between;font-size:13.5px;color:var(--ink2)}
   .prow .pct{font-weight:800;color:var(--ink)}
 
-  .track{height:34px;border-radius:12px;background:#131419;border:1px solid #22242b;
-    position:relative;overflow:hidden}
-  .track::before{content:"";position:absolute;left:8px;right:8px;bottom:6px;height:0;
-    border-bottom:2px dashed #2b2d36}
-  .runner{position:absolute;top:4px;left:100%;font-size:21px;line-height:1;
-    filter:drop-shadow(0 2px 3px rgba(0,0,0,.5));
-    animation:run linear infinite;animation-duration:var(--dur,6s)}
-  .runner.flip{transform:scaleX(-1)}
-  @keyframes run{from{left:calc(100% + 6px)}to{left:-34px}}
-  .track.stop .runner{animation:none;left:12px;opacity:.4}
-  .track .trail{position:absolute;top:12px;left:100%;font-size:10px;color:var(--ac);opacity:0;
-    animation:run linear infinite;animation-duration:var(--dur,6s);animation-delay:.12s}
-  .track.fast .trail{opacity:.7}
+  .track{height:60px;border-radius:12px;background:#131419;border:1px solid #22242b;position:relative}
+  .track[hidden]{display:none}
+  .track-inner{position:absolute;inset:0 15px}
+  .track-inner::before{content:"";position:absolute;left:0;right:0;top:32px;border-bottom:1px solid #454852}
+  .runner{position:absolute;top:7px;left:var(--progress,0%);font-size:21px;line-height:1;--facing:-1;
+    transform:translateX(-50%) scaleX(var(--facing));filter:drop-shadow(0 2px 3px rgba(0,0,0,.5));
+    transition:left 1.2s ease;animation:runner-step .65s ease-in-out infinite alternate}
+  .runner.flip{--facing:1}
+  @keyframes runner-step{to{transform:translate(-50%,-2px) scaleX(var(--facing))}}
+  .track.stop .runner{animation:none}
+  .ruler-tick{position:absolute;top:32px;transform:translateX(-50%);font-size:8px;line-height:1;color:var(--ink2);text-align:center}
+  .ruler-tick::before{content:"";display:block;width:0;height:6px;border-left:1px solid #626671;margin:0 auto 5px}
+  .baseline-note{font-size:11px;line-height:1.4;color:var(--ink2)}
   .tierlab b{color:var(--ac)!important}
 
   .views{font-size:15px;color:var(--ink2)}
@@ -130,6 +130,13 @@
   .subvalue{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;justify-content:flex-end}
   .subdelta{font-size:12px;white-space:nowrap}
   .subdelta.down{color:var(--bad)}
+  .follow-reasons{display:flex;flex-direction:column;gap:6px;margin-top:3px}
+  .follow-reason{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--ink3)}
+  .follow-reason textarea{box-sizing:border-box;width:100%;min-width:0;height:44px;resize:none;
+    border:1px dashed #454852;border-radius:8px;background:#131419;color:var(--ink2);
+    padding:6px 9px;font:inherit;font-size:12px;line-height:1.4}
+  .follow-reason textarea::placeholder{color:var(--ink3)}
+  .follow-reason textarea:focus{outline:2px solid var(--ac);outline-offset:2px;border-style:solid;color:var(--ink)}
   .mile{display:none;align-items:center;gap:8px;font-size:14.5px;font-weight:800;color:#ffd76a;align-self:flex-start;
     background:linear-gradient(90deg,#3a2f12,#2a2410);border:1px solid #8a6d2f66;border-radius:12px;padding:7px 12px;
     animation:milepulse 1.6s ease-in-out infinite}
@@ -188,8 +195,8 @@
   body.dense .badge svg{width:27px}
   body.dense .eyebrow{padding-right:54px}
   body.dense .spark{height:44px}
-  body.dense .track{height:28px}
-  body.dense .runner{font-size:18px;top:3px}
+  body.dense .track{height:56px}
+  body.dense .runner{font-size:18px;top:10px}
   body.dense .subrow{padding:6px 12px}
   /* ── mobile (≤768px) — 데스크톱 레이아웃 불변, 폰 가독성 보강 ── */
   @media(max-width:768px){
@@ -220,6 +227,7 @@
   <span>데이터 기준 <b id="dataDate">연결 중…</b></span>
   <span>피드 동기화 <b id="syncAgo">연결 중…</b></span>
   <span>출처 <b>1club_data · 롤스로이스 월간시트 · 샤오홍슈</b> (15분 간격 시트 동기화)</span>
+  <span id="reasonNotice" role="status">팔로우 이유는 직접 입력 · 이 브라우저에만 자동 저장</span>
 </div>
 <div id="banner"></div>
 
@@ -246,7 +254,7 @@ const FEED_CSV=`https://docs.google.com/spreadsheets/d/${PUB}/gviz/tq?tqx=out:cs
 const HIST_CSV=`https://docs.google.com/spreadsheets/d/${PUB}/gviz/tq?tqx=out:csv&sheet=history`;
 
 const KPI = [
- {id:"rr",   sec:"agency", ac:"#b08d3e", em:"🚗", client:"ROLLS-ROYCE", name:"인스타그램",      handle:"@rollsroycecarsseoul",       goal:30000, kind:"daily", idx:0, feed:"rollsroycecarsseoul"},
+ {id:"rr",   sec:"agency", ac:"#b08d3e", em:"🚗", client:"ROLLS-ROYCE", name:"인스타그램",      handle:"@rollsroycecarsseoul",       goal:30000, baseline:22012, baselineDate:"2026-02", kind:"daily", idx:0, feed:"rollsroycecarsseoul"},
  {id:"plus", sec:"agency", ac:"#c94a33", em:"💸", client:"한화 PLUS",   name:"인스타그램",      handle:"@pluskr_official",          goal:10000, kind:"daily", idx:3, feed:"pluskr_official", vk:"views_pluskr_official"},
  {id:"kef",  sec:"agency", ac:"#2fa896", em:"🔊", client:"KEF",         name:"인스타그램",      handle:"@kef.korea",                goal:15000, kind:"daily", idx:2, feed:"kef.korea"},
  {id:"prov", sec:"agency", ac:"#b08d3e", em:"🔑", client:"ROLLS-ROYCE", name:"프로비넌스",      handle:"@rollsroyceseoulprovenance", goal:5000,  kind:"daily", idx:1, feed:"rollsroyceseoulprovenance"},
@@ -254,8 +262,8 @@ const KPI = [
  {id:"yt",   sec:"agency", ac:"#b08d3e", em:"📺", client:"ROLLS-ROYCE", name:"유튜브 구독자",   handle:"구독자",                     goal:2000,  kind:"monthly", row:"유튜브",   feed:"rr_youtube"},
  {id:"kr",   sec:"own", ac:"#a75fd3", em:"🇰🇷", svg:'<svg viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#fff"/><circle cx="18" cy="12" r="6" fill="#cd2e3a"/><path d="M12 12a3 3 0 0 1 6 0a3 3 0 0 0 6 0a6 6 0 0 1-12 0z" fill="#0047a0"/><g fill="#1a1a1a"><g transform="translate(6.7,5.8) rotate(-56)"><rect x="-3" y="-2.5" width="6" height="1.1"/><rect x="-3" y="-.55" width="6" height="1.1"/><rect x="-3" y="1.4" width="6" height="1.1"/></g><g transform="translate(29.3,18.2) rotate(-56)"><rect x="-3" y="-2.5" width="2.6" height="1.1"/><rect x=".4" y="-2.5" width="2.6" height="1.1"/><rect x="-3" y="-.55" width="2.6" height="1.1"/><rect x=".4" y="-.55" width="2.6" height="1.1"/><rect x="-3" y="1.4" width="2.6" height="1.1"/><rect x=".4" y="1.4" width="2.6" height="1.1"/></g><g transform="translate(29.3,5.8) rotate(56)"><rect x="-3" y="-2.5" width="2.6" height="1.1"/><rect x=".4" y="-2.5" width="2.6" height="1.1"/><rect x="-3" y="-.55" width="6" height="1.1"/><rect x="-3" y="1.4" width="2.6" height="1.1"/><rect x=".4" y="1.4" width="2.6" height="1.1"/></g><g transform="translate(6.7,18.2) rotate(56)"><rect x="-3" y="-2.5" width="6" height="1.1"/><rect x="-3" y="-.55" width="2.6" height="1.1"/><rect x=".4" y="-.55" width="2.6" height="1.1"/><rect x="-3" y="1.4" width="6" height="1.1"/></g></g></svg>', client:"1%CLUB",       name:"코리아",   handle:"@1club.kr",     goal:500000, kind:"own", own:0, feed:"1club.kr", vk:"views_1club.kr"},
  {id:"mfk",  sec:"own", ac:"#4e86c8", em:"🌏", client:"MYFIRSTKOREA", name:"글로벌",   handle:"@myfirstkorea", goal:300000, kind:"own", own:1, feed:"myfirstkorea", vk:"views_myfirstkorea"},
- {id:"jp",   sec:"own", ac:"#55a05f", em:"🇯🇵", svg:'<svg viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#fff"/><circle cx="18" cy="12" r="7" fill="#bc002d"/></svg>', client:"1%CLUB JP",    name:"재팬",     handle:"@1club.jp",     kind:"own", own:2, feed:"1club.jp", vk:"views_1club.jp"},
- {id:"xhs", sec:"own", ac:"#c14953", em:"📕", client:"XIAOHONGSHU", name:"샤오홍슈", handle:"小红书", kind:"group", asOf:"2026-07-28",
+ {id:"jp",   sec:"own", ac:"#55a05f", em:"🇯🇵", svg:'<svg viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#fff"/><circle cx="18" cy="12" r="7" fill="#bc002d"/></svg>', client:"1%CLUB JP",    name:"재팬",     handle:"@1club.jp",     goal:50000, kind:"own", own:2, feed:"1club.jp", vk:"views_1club.jp"},
+ {id:"xhs", sec:"own", ac:"#c14953", em:"📕", client:"XIAOHONGSHU", name:"샤오홍슈", handle:"小红书", goal:50000, kind:"group", asOf:"2026-07-28",
   subs:[{key:"xhs_1club",label:"1%CLUB",val:74},{key:"xhs_mfk",label:"MyFirstKorea",val:4254}]},
 ];
 
@@ -423,6 +431,11 @@ async function refresh(){
 const fmt=n=>Math.floor(n).toLocaleString("ko-KR");
 const fmtViews=v=> v>=1e8? (v/1e8).toFixed(1).replace(/\.0$/,"")+"억" : v>=1e4? Math.round(v/1e4).toLocaleString("ko-KR")+"만" : v.toLocaleString("ko-KR");
 const MILES=[1000,3000,5000,10000,20000,30000,50000,70000,100000,150000,200000,300000,400000,500000,700000,1000000];
+function goalProgress(k,value){
+  const start=k.baseline===undefined?0:k.baseline;
+  if(!k.goal||!Number.isFinite(start)||k.goal<=start) return null;
+  return Math.max(0,Math.min(100,(value-start)/(k.goal-start)*100));
+}
 function card(k,i){
   const el=document.createElement("div");
   el.className="card"; el.id="c_"+k.id; el.style.setProperty("--ac",k.ac);
@@ -431,7 +444,7 @@ function card(k,i){
     <div class="prow num"><span class="pct" id="p_${k.id}">—%</span><span id="r_${k.id}"></span></div>`:"";
   const subrows=k.kind==="group"?`<div class="subrows num">${k.subs.map((s,si)=>`<div class="subrow"><span>${s.label}</span><span class="subvalue"><b id="x_${k.id}_${si}">${s.val.toLocaleString()}</b><span class="subdelta" id="xd_${k.id}_${si}"></span></span></div>`).join("")}</div>`:"";
   const bottom = `${subrows}<div class="mile num" id="m_${k.id}"></div>
-       <div class="track" id="tk_${k.id}"><span class="runner" id="rn_${k.id}">🏃</span><span class="trail">〰〰</span></div>
+       <div class="track" id="tk_${k.id}" role="progressbar" aria-label="${k.client} ${k.name} 목표 달성률" aria-valuemin="0" aria-valuemax="100"><div class="track-inner"><span class="runner" id="rn_${k.id}" aria-hidden="true">🏃</span>${Array.from({length:11},(_,n)=>`<span class="ruler-tick" style="left:${n*10}%" aria-hidden="true">${n*10}%</span>`).join("")}</div></div>
        <div class="line2"><div class="stats num" id="s_${k.id}"></div><div class="today num" id="t_${k.id}"></div></div>
        ${k.goal?`<div class="eta" id="e_${k.id}"></div>`:""}
        <div class="sparkwrap"><canvas class="spark" id="sp_${k.id}"></canvas><div class="tip" id="tp_${k.id}"></div></div>`;
@@ -440,7 +453,24 @@ function card(k,i){
     <div class="eyebrow"><span class="chip">${k.client}</span> ${k.name} <span class="handle">${k.handle}</span></div>
     <div class="bignum num"><span id="n_${k.id}">—</span>${goalHtml}</div>
     ${k.vk?`<div class="views num" id="v_${k.id}"></div>`:""}
-    ${barHtml}${bottom}`;
+    ${barHtml}${k.baseline!==undefined?`<div class="baseline-note" id="base_${k.id}"></div>`:""}${bottom}<div class="follow-reasons"></div>`;
+  const reasons=k.subs||[{key:k.feed,label:k.client+" "+k.name}];
+  reasons.forEach(s=>{
+    const label=document.createElement("label"), title=document.createElement("span"), input=document.createElement("textarea");
+    label.className="follow-reason";
+    title.textContent=(k.subs?s.label+" · ":"")+"팔로우해야 하는 이유";
+    input.rows=2;
+    input.placeholder="클릭해서 입력";
+    input.setAttribute("aria-label",s.label+" 팔로우해야 하는 이유");
+    const key="kpi-follow-reason-v1:"+s.key;
+    try{ input.value=localStorage.getItem(key)||""; }catch(e){}
+    input.addEventListener("input",()=>{
+      try{ localStorage.setItem(key,input.value); }
+      catch(e){ document.getElementById("reasonNotice").textContent="문구 저장 불가 · 브라우저 저장 설정을 확인해주세요"; }
+    });
+    label.append(title,input);
+    el.querySelector(".follow-reasons").appendChild(label);
+  });
   document.getElementById(k.sec==="agency"?"gridAgency":"gridOwn").appendChild(el);
 }
 KPI.forEach(card);
@@ -552,13 +582,19 @@ function renderStatic(){
     if(k.vk){ const ve=document.getElementById("v_"+k.id);
       if(ve) ve.innerHTML = st.views? `👁 월간 조회수 <b>${fmtViews(st.views)}</b>` : ""; }
     if(k.goal){
-      const pct=Math.min(100,st.last/k.goal*100);
-      document.getElementById("b_"+k.id).style.width=pct.toFixed(1)+"%";
-      document.getElementById("p_"+k.id).textContent=pct.toFixed(1)+"%";
+      const pct=goalProgress(k,st.last);
+      document.getElementById("b_"+k.id).style.width=(pct==null?0:pct).toFixed(1)+"%";
+      document.getElementById("p_"+k.id).textContent=pct==null?"시작값 확인 중":pct.toFixed(1)+"%";
       document.getElementById("r_"+k.id).textContent="남은 "+(k.goal-st.last>0?fmt(k.goal-st.last):0);
+      if(k.baseline!==undefined){
+        document.getElementById("base_"+k.id).textContent=Number.isFinite(k.baseline)
+          ?`운영 시작월 말 ${k.baselineDate} · ${fmt(k.baseline)}명 → ${fmt(k.goal)}명 / 누적 ${st.last-k.baseline>=0?"+":""}${(st.last-k.baseline).toLocaleString()}명`
+          :"운영 시작 당시 팔로워 수 확인 중";
+      }
       document.getElementById("c_"+k.id).classList.toggle("near",pct>=85);
       const e=document.getElementById("e_"+k.id), remain=k.goal-st.last, r=st.rate;
       if(remain<=0){ e.className="eta ok"; e.textContent="✦ 목표 달성!"; }
+      else if(r==null){ e.className="eta"; e.textContent="추이 집계 중"; }
       else if(r<=0.2){ e.className="eta bad"; e.textContent="⏸ 정체 — 부스트 필요"; }
       else{
         const dt=new Date(Date.now()+remain/r*86400000), y=dt.getFullYear();
@@ -590,14 +626,15 @@ function renderStatic(){
       +(r==null?"":`<span class="s tierlab">${tier.em} <b>${tier.label}</b></span>`)
       +(k.kind!=="monthly"?`<span class="s" style="color:var(--ink3)">7일 평균 ${r==null?"집계 중":(r>0?"+":"")+Math.round(r).toLocaleString()+"/일"}</span>`:"")+extra;
     const tk=document.getElementById("tk_"+k.id), rn=document.getElementById("rn_"+k.id);
-    tk.hidden=r==null;
+    const progress=goalProgress(k,st.last);
+    tk.hidden=progress==null;
+    if(progress!=null){
+      tk.style.setProperty("--progress",progress.toFixed(2)+"%");
+      tk.setAttribute("aria-valuenow",progress.toFixed(1));
+      tk.setAttribute("aria-valuetext",`${progress.toFixed(1)}% · ${fmt(st.last)}명 / 목표 ${fmt(k.goal)}명`);
+    }
     rn.textContent=tier.em; rn.classList.toggle("flip",tier.flip);
-    if(tier.move){
-      tk.classList.remove("stop");
-      const dur=Math.max(2.2,Math.min(11,50/Math.sqrt(Math.max(r,0.3))));
-      tk.style.setProperty("--dur",dur.toFixed(2)+"s");
-      tk.classList.toggle("fast",r>=150);
-    } else { tk.classList.add("stop"); tk.classList.remove("fast"); }
+    tk.classList.toggle("stop",!tier.move||r==null);
     if(st.lastDate>latest&&k.kind!=="monthly"&&k.kind!=="group") latest=st.lastDate;
     drawSpark(k);
   });
