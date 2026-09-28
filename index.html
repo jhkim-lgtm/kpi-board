@@ -127,6 +127,9 @@
   .subrow{display:flex;justify-content:space-between;align-items:baseline;font-size:15px;color:var(--ink2);
     background:#131419;border:1px solid #22242b;border-radius:12px;padding:9px 14px}
   .subrow b{font-size:22px;color:var(--ink);font-weight:800}
+  .subvalue{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .subdelta{font-size:12px;white-space:nowrap}
+  .subdelta.down{color:var(--bad)}
   .mile{display:none;align-items:center;gap:8px;font-size:14.5px;font-weight:800;color:#ffd76a;align-self:flex-start;
     background:linear-gradient(90deg,#3a2f12,#2a2410);border:1px solid #8a6d2f66;border-radius:12px;padding:7px 12px;
     animation:milepulse 1.6s ease-in-out infinite}
@@ -252,7 +255,7 @@ const KPI = [
  {id:"kr",   sec:"own", ac:"#a75fd3", em:"🇰🇷", svg:'<svg viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#fff"/><circle cx="18" cy="12" r="6" fill="#cd2e3a"/><path d="M12 12a3 3 0 0 1 6 0a3 3 0 0 0 6 0a6 6 0 0 1-12 0z" fill="#0047a0"/><g fill="#1a1a1a"><g transform="translate(6.7,5.8) rotate(-56)"><rect x="-3" y="-2.5" width="6" height="1.1"/><rect x="-3" y="-.55" width="6" height="1.1"/><rect x="-3" y="1.4" width="6" height="1.1"/></g><g transform="translate(29.3,18.2) rotate(-56)"><rect x="-3" y="-2.5" width="2.6" height="1.1"/><rect x=".4" y="-2.5" width="2.6" height="1.1"/><rect x="-3" y="-.55" width="2.6" height="1.1"/><rect x=".4" y="-.55" width="2.6" height="1.1"/><rect x="-3" y="1.4" width="2.6" height="1.1"/><rect x=".4" y="1.4" width="2.6" height="1.1"/></g><g transform="translate(29.3,5.8) rotate(56)"><rect x="-3" y="-2.5" width="2.6" height="1.1"/><rect x=".4" y="-2.5" width="2.6" height="1.1"/><rect x="-3" y="-.55" width="6" height="1.1"/><rect x="-3" y="1.4" width="2.6" height="1.1"/><rect x=".4" y="1.4" width="2.6" height="1.1"/></g><g transform="translate(6.7,18.2) rotate(56)"><rect x="-3" y="-2.5" width="6" height="1.1"/><rect x="-3" y="-.55" width="2.6" height="1.1"/><rect x=".4" y="-.55" width="2.6" height="1.1"/><rect x="-3" y="1.4" width="6" height="1.1"/></g></g></svg>', client:"1%CLUB",       name:"코리아",   handle:"@1club.kr",     goal:500000, kind:"own", own:0, feed:"1club.kr", vk:"views_1club.kr"},
  {id:"mfk",  sec:"own", ac:"#4e86c8", em:"🌏", client:"MYFIRSTKOREA", name:"글로벌",   handle:"@myfirstkorea", goal:300000, kind:"own", own:1, feed:"myfirstkorea", vk:"views_myfirstkorea"},
  {id:"jp",   sec:"own", ac:"#55a05f", em:"🇯🇵", svg:'<svg viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#fff"/><circle cx="18" cy="12" r="7" fill="#bc002d"/></svg>', client:"1%CLUB JP",    name:"재팬",     handle:"@1club.jp",     kind:"own", own:2, feed:"1club.jp", vk:"views_1club.jp"},
- {id:"xhs", sec:"own", ac:"#c14953", em:"📕", client:"XIAOHONGSHU", name:"샤오홍슈", handle:"小红书", kind:"static2", asOf:"2026-07-28",
+ {id:"xhs", sec:"own", ac:"#c14953", em:"📕", client:"XIAOHONGSHU", name:"샤오홍슈", handle:"小红书", kind:"group", asOf:"2026-07-28",
   subs:[{key:"xhs_1club",label:"1%CLUB",val:74},{key:"xhs_mfk",label:"MyFirstKorea",val:4254}]},
 ];
 
@@ -324,12 +327,39 @@ function applyMonthly(k,months,current,asOf){
   st.d30=diffs.length?diffs[diffs.length-1]:null;
   st.baseTs=new Date(st.lastDate+"T10:00:00+09:00").getTime();
 }
+function applyGroup(k,feed={},hist={}){
+  const subs=k.subs.map(s=>{
+    const values=new Map();
+    (hist[s.key]||[]).forEach(p=>{
+      if(/^\d{4}-\d{2}-\d{2}$/.test(p.d)&&Number.isFinite(p.v)&&p.v>=0) values.set(p.d,p.v);
+    });
+    const f=feed[s.key];
+    if(f&&/^\d{4}-\d{2}-\d{2}$/.test(f.date)&&Number.isFinite(f.last)&&f.last>=0) values.set(f.date,f.last);
+    if(!values.size) values.set(k.asOf,s.val);
+    const series=[...values].map(([d,v])=>({d,v})).sort((a,b)=>a.d.localeCompare(b.d));
+    const last=series[series.length-1];
+    // Calendar-day anchors: a missing day is unknown, never zero growth.
+    const delta=days=>{
+      const date=new Date(Date.parse(last.d+"T00:00:00Z")-days*86400000).toISOString().slice(0,10);
+      return values.has(date)?last.v-values.get(date):null;
+    };
+    const d7=delta(7);
+    return {last:last.v,lastDate:last.d,values,d1:delta(1),rate:d7==null?null:d7/7,d30:delta(30)};
+  });
+  const dates=subs.map(s=>s.lastDate).sort();
+  const sameDate=dates[0]===dates[dates.length-1];
+  const sum=key=>sameDate&&subs.every(s=>s[key]!=null)?subs.reduce((n,s)=>n+s[key],0):null;
+  const series=[...subs[0].values.keys()].filter(d=>subs.every(s=>s.values.has(d))).sort()
+    .map(d=>({d,v:subs.reduce((n,s)=>n+s.values.get(d),0)}));
+  S[k.id]={subs,last:subs.reduce((n,s)=>n+s.last,0),lastDate:sameDate?dates[0]:dates[0]+" ~ "+dates[dates.length-1],
+    series:series.slice(-90),d1:sum("d1"),rate:sum("rate"),d30:sum("d30")};
+}
 function loadBaked(){
   KPI.forEach(k=>{
     if(k.kind==="daily") applySeries(k,bakeDates(BAKED_AGENCY[k.idx]),null);
     else if(k.kind==="own") applySeries(k,bakeDates(BAKED_OWN[k.own]),null);
     else if(k.kind==="monthly"){ const b=BAKED_MONTHLY[k.row]; applyMonthly(k,b.months,b.current,b.asOf); }
-    else if(k.kind==="static2") S[k.id]={series:null,last:k.subs.reduce((a,s)=>a+s.val,0),lastDate:k.asOf,rate:0,baseTs:Date.now(),subs:k.subs.map(s=>s.val)};
+    else if(k.kind==="group") applyGroup(k);
     else S[k.id]={series:null,last:k.val,lastDate:k.asOf,rate:0,baseTs:Date.now()};
   });
   KPI.forEach(k=>{ if(k.vk&&BAKED_VIEWS[k.id]) S[k.id].views=BAKED_VIEWS[k.id]; });
@@ -365,7 +395,7 @@ async function refresh(){
       d0:csvNumber(r[7]), d1:csvNumber(r[8])}; });
     const hist={};
     if(ht) parseCsv(ht).slice(1).forEach(r=>{ if(r[1]&&/^\d{4}-\d{2}-\d{2}$/.test(r[0]))
-      (hist[r[1]]=hist[r[1]]||[]).push({d:r[0],v:+String(r[2]).replace(/,/g,"")||0}); });
+      (hist[r[1]]=hist[r[1]]||[]).push({d:r[0],v:csvNumber(r[2])}); });
     if(!Object.keys(feed).length) throw new Error("empty feed");
     KPI.forEach(k=>{
       const f=feed[k.feed];
@@ -375,13 +405,7 @@ async function refresh(){
         const b=BAKED_MONTHLY[k.row];
         applyMonthly(k, b.months, f.last, f.date);
       }
-      else if(k.kind==="static2"){
-        let tot=0, dt=null;
-        k.subs.forEach((s,si)=>{ const fr=feed[s.key]; if(fr&&fr.last){ S[k.id].subs[si]=fr.last; dt=fr.date; } tot+=S[k.id].subs[si]||0; });
-        if(dt){ S[k.id].last=tot; S[k.id].lastDate=dt; shown[k.id]=null;
-          const m=document.querySelector("#c_"+k.id+" .manual");
-          if(m) m.textContent="일 1회 자동 집계 · "+dt+" 기준"; }
-      }
+      else if(k.kind==="group") applyGroup(k,feed,hist);
     });
     KPI.forEach(k=>{ if(k.vk&&feed[k.vk]&&feed[k.vk].last) S[k.id].views=feed[k.vk].last; });
     const feedTimes=Object.values(feed).map(f=>f.ts&&Date.parse(f.ts.replace(" ","T")+":00+09:00")).filter(Number.isFinite);
@@ -405,10 +429,8 @@ function card(k,i){
   const goalHtml = k.goal? `<span class="goal">/ ${k.goal.toLocaleString()}</span>` : "";
   const barHtml = k.goal? `<div class="pbar"><i id="b_${k.id}" style="width:0%"></i></div>
     <div class="prow num"><span class="pct" id="p_${k.id}">—%</span><span id="r_${k.id}"></span></div>`:"";
-  const bottom = k.kind==="static2"
-    ? `<div class="subrows num">${k.subs.map((s,si)=>`<div class="subrow"><span>${s.label}</span><b id="x_${k.id}_${si}">${s.val.toLocaleString()}</b></div>`).join("")}</div>
-       <div class="manual">일 1회 자동 집계 · ${k.asOf} 기준</div>`
-    : `<div class="mile num" id="m_${k.id}"></div>
+  const subrows=k.kind==="group"?`<div class="subrows num">${k.subs.map((s,si)=>`<div class="subrow"><span>${s.label}</span><span class="subvalue"><b id="x_${k.id}_${si}">${s.val.toLocaleString()}</b><span class="subdelta" id="xd_${k.id}_${si}"></span></span></div>`).join("")}</div>`:"";
+  const bottom = `${subrows}<div class="mile num" id="m_${k.id}"></div>
        <div class="track" id="tk_${k.id}"><span class="runner" id="rn_${k.id}">🏃</span><span class="trail">〰〰</span></div>
        <div class="line2"><div class="stats num" id="s_${k.id}"></div><div class="today num" id="t_${k.id}"></div></div>
        ${k.goal?`<div class="eta" id="e_${k.id}"></div>`:""}
@@ -430,7 +452,11 @@ function drawSpark(k){
   const cv=document.getElementById("sp_"+k.id); if(!cv) return;
   const w=cv.clientWidth||280,h=cv.clientHeight||60,dpr=window.devicePixelRatio||1;
   cv.width=w*dpr; cv.height=h*dpr;
-  const pts=st.series; if(pts.length<2) return;
+  const pts=st.series; if(pts.length<2){
+    delete SPARKS[k.id]; cv.onmousemove=null;
+    document.getElementById("tp_"+k.id).style.display="none";
+    return;
+  }
   const vs=pts.map(p=>p.v),mn=Math.min(...vs),mx=Math.max(...vs),sp=(mx-mn)||1;
   const X=i=>3+(w-6)*i/(pts.length-1), Y=v=>4+(h-9)*(1-(v-mn)/sp);
   const col=k.ac;
@@ -514,9 +540,14 @@ function renderStatic(){
   let latest="";
   KPI.forEach(k=>{
     const st=S[k.id];
-    if(k.kind==="static2"){
-      if(k.subs&&st.subs) k.subs.forEach((s,si)=>{ const e=document.getElementById("x_"+k.id+"_"+si); if(e&&st.subs[si]!=null) e.textContent=st.subs[si].toLocaleString("ko-KR"); });
-      return;
+    if(k.kind==="group"){
+      k.subs.forEach((s,si)=>{
+        const sub=st.subs[si], e=document.getElementById("x_"+k.id+"_"+si), d=document.getElementById("xd_"+k.id+"_"+si);
+        e.textContent=sub.last.toLocaleString("ko-KR");
+        d.className="subdelta "+(sub.d1>0?"up":sub.d1<0?"down":"flat");
+        d.textContent=sub.d1==null?"전일 —":`전일 ${sub.d1>0?"▲ +":sub.d1<0?"▼ ":"― "}${sub.d1.toLocaleString("ko-KR")}`;
+        e.parentElement.title=sub.lastDate+" 수집 기준";
+      });
     }
     if(k.vk){ const ve=document.getElementById("v_"+k.id);
       if(ve) ve.innerHTML = st.views? `👁 월간 조회수 <b>${fmtViews(st.views)}</b>` : ""; }
@@ -548,16 +579,18 @@ function renderStatic(){
       } else { mel.style.display="none"; cardEl.classList.remove("hype"); }
     }
     const s=document.getElementById("s_"+k.id), r=st.rate;
-    const rv=k.kind==="monthly"?r*30:(st.d1!=null?st.d1:r);
+    const rv=k.kind==="monthly"?r*30:k.kind==="group"?st.d1:(st.d1!=null?st.d1:r);
     const cls=rv>0?"up":(rv<0?"down":"flat"), arrow=rv>0?"▲":(rv<0?"▼":"―");
     let extra="";
     if(st.d30!=null&&k.kind!=="monthly") extra=`<span class="s" style="color:var(--ink3)">30일 ${st.d30>=0?"+":""}${st.d30.toLocaleString()}</span>`;
+    else if(k.kind==="group") extra=`<span class="s" style="color:var(--ink3)">30일 집계 중</span>`;
     const tier=speedTier(r);
     const period=k.kind==="monthly"?"이번 달":"전일";
-    s.innerHTML=`<span class="s d1 ${cls}"><i>${arrow}</i><b>${rv>0?"+":""}${Math.round(rv).toLocaleString()}</b><small>${period}</small></span>`
-      +`<span class="s tierlab">${tier.em} <b>${tier.label}</b></span>`
-      +(k.kind!=="monthly"?`<span class="s" style="color:var(--ink3)">7일 평균 ${r>0?"+":""}${Math.round(r).toLocaleString()}/일</span>`:"")+extra;
+    s.innerHTML=`<span class="s d1 ${cls}"><i>${rv==null?"":arrow}</i><b>${rv==null?"—":(rv>0?"+":"")+Math.round(rv).toLocaleString()}</b><small>${period}</small></span>`
+      +(r==null?"":`<span class="s tierlab">${tier.em} <b>${tier.label}</b></span>`)
+      +(k.kind!=="monthly"?`<span class="s" style="color:var(--ink3)">7일 평균 ${r==null?"집계 중":(r>0?"+":"")+Math.round(r).toLocaleString()+"/일"}</span>`:"")+extra;
     const tk=document.getElementById("tk_"+k.id), rn=document.getElementById("rn_"+k.id);
+    tk.hidden=r==null;
     rn.textContent=tier.em; rn.classList.toggle("flip",tier.flip);
     if(tier.move){
       tk.classList.remove("stop");
@@ -565,15 +598,16 @@ function renderStatic(){
       tk.style.setProperty("--dur",dur.toFixed(2)+"s");
       tk.classList.toggle("fast",r>=150);
     } else { tk.classList.add("stop"); tk.classList.remove("fast"); }
-    if(st.lastDate>latest&&k.kind!=="monthly") latest=st.lastDate;
+    if(st.lastDate>latest&&k.kind!=="monthly"&&k.kind!=="group") latest=st.lastDate;
     drawSpark(k);
   });
   document.getElementById("dataDate").textContent=latest+" 10:00 KST (1club_data)";
   const own=KPI.filter(k=>k.sec==="own");
   const osum=own.reduce((a,k)=>a+S[k.id].last,0);
   const od1=own.reduce((a,k)=>a+(S[k.id].d1||0),0);
+  const partial=own.some(k=>S[k.id].d1==null);
   const ocls=od1>0?"up":(od1<0?"down":"flat"), oarrow=od1>0?"▲":(od1<0?"▼":"―");
-  document.getElementById("ownSum").innerHTML=`<b>${fmt(osum)}</b> 팔로워 <span class="${ocls}">${oarrow} ${od1>0?"+":""}${od1.toLocaleString()} 전일</span>`;
+  document.getElementById("ownSum").innerHTML=`<b>${fmt(osum)}</b> 팔로워 <span class="${ocls}">${oarrow} ${od1>0?"+":""}${od1.toLocaleString()} 전일${partial?" (일부 미집계)":""}</span>`;
   scheduleFit();
 }
 
@@ -583,7 +617,6 @@ function tick(){
   KPI.forEach(k=>{
     const st=S[k.id]; if(!st) return;
     const el=document.getElementById("n_"+k.id);
-    if(k.kind==="static2"){ if(shown[k.id]!==st.last){ shown[k.id]=st.last; el.textContent=st.last.toLocaleString("ko-KR"); } return; }
     const iv=Math.floor(st.last);
     if(shown[k.id]!==iv){
       if(shown[k.id]!=null&&iv>shown[k.id]){ const b=el.parentElement; b.classList.remove("tick"); void b.offsetWidth; b.classList.add("tick"); }
@@ -591,7 +624,7 @@ function tick(){
     }
     const td=document.getElementById("t_"+k.id); if(!td) return;
     td.className="today num zero";
-    td.innerHTML=k.kind==="monthly"?"월간 시트 실측":`<b>${st.lastDate}</b> 시트 기준`;
+    td.innerHTML=k.kind==="monthly"?"월간 시트 실측":`<b>${st.lastDate}</b> ${k.kind==="group"?"수집":"시트"} 기준`;
   });
 }
 setInterval(tick,200);
