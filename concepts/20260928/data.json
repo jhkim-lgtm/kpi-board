@@ -1,0 +1,160 @@
+{
+  "fetchedAt": "2026-09-28T21:26:41+09:00",
+  "dataDate": "2026-09-28",
+  "source": "기존 대시보드 공개 피드·일별 기록",
+  "rows": [
+    {
+      "id": "kr",
+      "name": "1%CLUB 코리아",
+      "sub": "Instagram",
+      "group": "own",
+      "current": 313763,
+      "delta": -68,
+      "period": "전일",
+      "goal": 500000,
+      "baseline": 0,
+      "progress": 62.7526,
+      "asOf": "2026-09-28",
+      "parts": []
+    },
+    {
+      "id": "mfk",
+      "name": "MyFirstKorea",
+      "sub": "Instagram",
+      "group": "own",
+      "current": 109405,
+      "delta": 110,
+      "period": "전일",
+      "goal": 300000,
+      "baseline": 0,
+      "progress": 36.468333333333334,
+      "asOf": "2026-09-28",
+      "parts": []
+    },
+    {
+      "id": "jp",
+      "name": "1%CLUB 재팬",
+      "sub": "Instagram",
+      "group": "own",
+      "current": 28219,
+      "delta": 16,
+      "period": "전일",
+      "goal": 50000,
+      "baseline": 0,
+      "progress": 56.438,
+      "asOf": "2026-09-28",
+      "parts": []
+    },
+    {
+      "id": "xhs",
+      "name": "샤오홍슈",
+      "sub": "2개 계정 합계",
+      "group": "own",
+      "current": 4455,
+      "delta": 4,
+      "period": "전일",
+      "goal": 50000,
+      "baseline": 0,
+      "progress": 8.91,
+      "asOf": "2026-09-28",
+      "parts": [
+        {
+          "name": "1%CLUB",
+          "current": 215,
+          "delta": 4,
+          "asOf": "2026-09-28"
+        },
+        {
+          "name": "MyFirstKorea",
+          "current": 4240,
+          "delta": 0,
+          "asOf": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "id": "rr",
+      "name": "롤스로이스 서울",
+      "sub": "Instagram",
+      "group": "agency",
+      "current": 23755,
+      "delta": 10,
+      "period": "전일",
+      "goal": 30000,
+      "baseline": 22012,
+      "progress": 21.820230345518276,
+      "asOf": "2026-09-28",
+      "parts": []
+    },
+    {
+      "id": "plus",
+      "name": "한화 PLUS",
+      "sub": "Instagram",
+      "group": "agency",
+      "current": 14709,
+      "delta": 0,
+      "period": "전일",
+      "goal": 10000,
+      "baseline": 0,
+      "progress": 100,
+      "asOf": "2026-09-28",
+      "parts": []
+    },
+    {
+      "id": "kef",
+      "name": "KEF",
+      "sub": "Instagram",
+      "group": "agency",
+      "current": 3836,
+      "delta": 0,
+      "period": "전일",
+      "goal": 15000,
+      "baseline": 0,
+      "progress": 25.57333333333333,
+      "asOf": "2026-09-28",
+      "parts": []
+    },
+    {
+      "id": "prov",
+      "name": "롤스로이스 프로비넌스",
+      "sub": "Instagram",
+      "group": "agency",
+      "current": 1269,
+      "delta": 2,
+      "period": "전일",
+      "goal": 5000,
+      "baseline": 0,
+      "progress": 25.380000000000003,
+      "asOf": "2026-09-28",
+      "parts": []
+    },
+    {
+      "id": "kakao",
+      "name": "롤스로이스 카카오",
+      "sub": "Kakao",
+      "group": "agency",
+      "current": 1243,
+      "delta": -1,
+      "period": "8월 전월 대비",
+      "goal": 2000,
+      "baseline": 0,
+      "progress": 62.150000000000006,
+      "asOf": "2026-08",
+      "parts": []
+    },
+    {
+      "id": "yt",
+      "name": "롤스로이스 유튜브",
+      "sub": "YouTube",
+      "group": "agency",
+      "current": 720,
+      "delta": 2,
+      "period": "8월 전월 대비",
+      "goal": 2000,
+      "baseline": 0,
+      "progress": 36.0,
+      "asOf": "2026-08",
+      "parts": []
+    }
+  ]
+}

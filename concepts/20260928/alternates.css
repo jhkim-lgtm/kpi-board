@@ -1,0 +1,95 @@
+/* 03 · Goal tracks: aligned bullet chart rows. */
+.concept-3 { --paper: #f6f7f6; --surface: #fff; --ink: #1b2725; --muted: #68746e; --line: #dfe5e1; --accent: #47715c; --up: #287049; --down: #b84749; }
+.concept-3 .tracks-view { color: var(--ink); }
+.concept-3 .track-columns, .concept-3 .track-row { display: grid; grid-template-columns: minmax(190px, 1.2fr) 110px 125px minmax(230px, 2.3fr) 136px; align-items: center; column-gap: 24px; }
+.concept-3 .track-columns { color: var(--muted); font-size: 12px; height: 34px; padding: 0 20px; }
+.concept-3 .track-columns > span:nth-child(2), .concept-3 .track-columns > span:last-child { text-align: right; }
+.concept-3 .track-scale { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+.concept-3 .track-scale b { font-size: 11px; font-weight: 500; }
+.concept-3 .track-group { margin-top: 9px; }
+.concept-3 .track-group h2 { display: flex; align-items: baseline; gap: 10px; margin: 0; padding: 9px 20px; border-bottom: 1px solid var(--line); font-size: 15px; letter-spacing: -.02em; }
+.concept-3 .track-group h2 span { color: var(--muted); font-size: 11px; font-weight: 500; }
+.concept-3 .track-row { min-height: 45px; border-bottom: 1px solid var(--line); padding: 6px 20px; background: rgba(255,255,255,.48); }
+.concept-3 .track-name strong { display: inline-block; font-size: 14px; font-weight: 650; letter-spacing: -.025em; }
+.concept-3 .track-name > span { display: inline-block; margin-left: 7px; color: var(--muted); font-size: 10px; }
+.concept-3 .track-current { text-align: right; font-size: 22px; font-weight: 650; letter-spacing: -.055em; }
+.concept-3 .track-change { font-size: 13px; }
+.concept-3 .track-change .delta { display: flex; align-items: center; gap: 5px; }
+.concept-3 .track-change .delta small, .concept-3 .track-change .delta span { font-size: 10px; }
+.concept-3 .track-graphic { padding: 9px 0; background: repeating-linear-gradient(to right, transparent 0, transparent calc(10% - 1px), rgba(111,132,119,.14) calc(10% - 1px), rgba(111,132,119,.14) 10%); }
+.concept-3 .track-graphic .meter { height: 5px; margin: 0; background: #e0e7e2; overflow: visible; }
+.concept-3 .track-graphic .meter-fill { background: #5c836c; }
+.concept-3 .track-graphic .meter-dot { width: 9px; height: 9px; background: #244b35; border: 2px solid #fff; box-shadow: 0 0 0 1px #244b35; }
+.concept-3 .track-target { text-align: right; }
+.concept-3 .track-target strong { display: block; font-size: 18px; letter-spacing: -.035em; }
+.concept-3 .track-target > span { display: block; margin-top: 2px; font-size: 10px; color: var(--muted); }
+.concept-3 .alt-parts { display: flex; gap: 7px; margin-top: 3px; color: var(--muted); font-size: 9px; white-space: nowrap; }
+.concept-3 .alt-parts b { font-weight: 500; }
+
+/* 04 · Daily changes: four editorial tiles and a compact agency ledger. */
+.concept-4 { --paper: #f8f5ee; --surface: #fdfcf9; --ink: #282b25; --muted: #777b71; --line: #d9d9ce; --accent: #777e65; --up: #347251; --down: #b34c42; }
+.concept-4 .change-view { display: grid; grid-template-columns: .95fr 1.05fr; gap: 42px; color: var(--ink); }
+.concept-4 .change-section-title { display: flex; align-items: baseline; justify-content: space-between; padding: 11px 0 14px; border-bottom: 2px solid #383e32; }
+.concept-4 .change-section-title h2 { font-size: 19px; letter-spacing: -.04em; margin: 0; }
+.concept-4 .change-section-title > span { color: var(--muted); font-size: 11px; }
+.concept-4 .change-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 0 26px; }
+.concept-4 .change-tile { padding: 21px 0 18px; border-bottom: 1px solid var(--line); min-width: 0; }
+.concept-4 .change-name { min-height: 25px; display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+.concept-4 .change-name h3 { margin: 0; font-size: 15px; letter-spacing: -.03em; }
+.concept-4 .change-name > span { font-size: 10px; color: var(--muted); }
+.concept-4 .change-hero { display: flex; align-items: baseline; gap: 9px; min-height: 62px; padding-top: 5px; }
+.concept-4 .change-hero strong { font-size: clamp(35px, 3.5vw, 51px); font-weight: 600; letter-spacing: -.065em; line-height: 1.1; }
+.concept-4 .change-hero > span { color: var(--muted); font-size: 10px; white-space: nowrap; }
+.concept-4 .up { color: var(--up); }
+.concept-4 .down { color: var(--down); }
+.concept-4 .flat { color: var(--muted); }
+.concept-4 .change-follower { display: flex; justify-content: space-between; align-items: baseline; margin-top: 9px; }
+.concept-4 .change-follower > span { font-size: 11px; color: var(--muted); }
+.concept-4 .change-follower b { font-size: 22px; font-weight: 600; letter-spacing: -.04em; }
+.concept-4 .alt-parts { display: flex; gap: 7px; flex-wrap: wrap; min-height: 13px; margin-top: 4px; color: var(--muted); font-size: 9px; }
+.concept-4 .alt-parts b { font-weight: 500; }
+.concept-4 .change-goal { margin-top: 15px; }
+.concept-4 .meter { height: 3px; background: #dddfd5; overflow: visible; }
+.concept-4 .meter-fill { background: #949c86; }
+.concept-4 .meter-dot { width: 6px; height: 6px; background: #4d5c3e; border: 0; }
+.concept-4 .change-goal > div:last-child { display: flex; justify-content: space-between; margin-top: 7px; color: var(--muted); font-size: 10px; }
+.concept-4 .change-goal b { color: var(--ink); font-weight: 600; }
+.concept-4 .change-agency-row { display: grid; grid-template-columns: minmax(130px, 1fr) 105px 105px; column-gap: 12px; align-items: center; min-height: 78px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.concept-4 .change-agency-name h3 { font-size: 14px; margin: 0; letter-spacing: -.025em; }
+.concept-4 .change-agency-name > span { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
+.concept-4 .change-agency-delta, .concept-4 .change-agency-current { text-align: right; }
+.concept-4 .change-agency-delta > strong { display: block; font-size: 28px; font-weight: 600; letter-spacing: -.05em; }
+.concept-4 .change-agency-delta > span, .concept-4 .change-agency-current > span { display: block; color: var(--muted); font-size: 10px; margin-top: 3px; }
+.concept-4 .change-agency-current > strong { display: block; font-size: 20px; font-weight: 600; letter-spacing: -.04em; }
+.concept-4 .change-agency-goal { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 158px; gap: 14px; align-items: center; margin-top: 10px; }
+.concept-4 .change-agency-goal > span { display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; }
+.concept-4 .change-agency-goal b { font-weight: 600; color: var(--ink); }
+.concept-4 .change-agency-goal .meter { margin: 0; }
+
+@media (max-width: 1050px) {
+  .concept-3 .track-columns, .concept-3 .track-row { grid-template-columns: minmax(145px, 1.1fr) 92px 90px minmax(130px, 1.4fr) 110px; gap: 13px; }
+  .concept-3 .track-name > span { display: block; margin: 2px 0 0; }
+  .concept-3 .alt-parts { flex-wrap: wrap; white-space: normal; }
+  .concept-4 .change-view { gap: 25px; grid-template-columns: 1fr 1fr; }
+  .concept-4 .change-hero { flex-wrap: wrap; gap: 3px; }
+  .concept-4 .change-hero > span { width: 100%; }
+  .concept-4 .change-agency-row { grid-template-columns: minmax(110px, 1fr) 82px 85px; gap: 7px; }
+}
+@media (max-width: 768px) {
+  .concept-3 .track-columns { display: none; }
+  .concept-3 .track-group h2 { padding: 12px 0; }
+  .concept-3 .track-row { grid-template-columns: minmax(0, 1fr) 100px; padding: 13px 0; gap: 7px 16px; }
+  .concept-3 .track-name { grid-column: 1; grid-row: 1; }
+  .concept-3 .track-current { grid-column: 2; grid-row: 1; font-size: 23px; }
+  .concept-3 .track-change { grid-column: 2; grid-row: 2; justify-self: end; }
+  .concept-3 .track-graphic { grid-column: 1; grid-row: 3; }
+  .concept-3 .track-target { grid-column: 2; grid-row: 3; }
+  .concept-3 .track-name > span { display: inline-block; margin-left: 7px; }
+  .concept-3 .alt-parts { font-size: 10px; }
+  .concept-4 .change-view { grid-template-columns: 1fr; gap: 30px; }
+  .concept-4 .change-hero strong { font-size: 40px; }
+  .concept-4 .change-hero > span { width: auto; }
+  .concept-4 .change-tile { padding-top: 19px; }
+  .concept-4 .change-agency-row { grid-template-columns: minmax(0, 1fr) 85px 94px; }
+  .concept-4 .change-tiles { gap: 0 20px; }
+}
