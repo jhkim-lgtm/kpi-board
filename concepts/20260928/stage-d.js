@@ -1,0 +1,9 @@
+/* 30 · Own-media arena and managed-channel tower terraces. */
+(() => {
+ function arena(ctx){
+  const ranks=new Map(ctx.all.filter(c=>c.period==='전일'&&c.delta>0).sort((a,b)=>b.delta-a.delta).slice(0,3).map((c,i)=>[c.id,i+1]));
+  const chamber=(c,small=false)=>`<article data-channel="${c.id}" class="sd30-chamber m-${ctx.M.status(c).key} ${small?'sd30-small':''}">${ctx.M.confetti(c)}<div class="sd30-identity"><h3>${c.name}</h3>${ranks.has(c.id)?`<span class="sd30-medal">${ctx.M.icon(ranks.get(c.id)===1?'trophy':'star')}성장 ${ranks.get(c.id)}위</span>`:ctx.M.badge(c)}</div><div class="sd30-numbers"><strong class="num">${ctx.fmt(c.current)}</strong>${ctx.change(c)}</div><div class="sd30-gauge" role="meter" aria-label="${c.name} 목표 진척" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${c.progress.toFixed(1)}" style="--level:${c.progress}%"><div class="sd30-steps" aria-hidden="true">${Array.from({length:11},(_,i)=>`<i style="bottom:${i*10}%"></i>`).join('')}</div><div class="sd30-fill"><i></i></div><div class="sd30-fixed"><b>${ctx.pct(c)}</b><i></i></div><div class="sd30-flight" aria-hidden="true">${ctx.M.icon(c.id==='rr'?'car':'rocket')}</div><span class="sd30-maximum">100%</span></div><div class="sd30-target"><span>목표</span><b>${ctx.fmt(c.goal)}</b></div><div class="sd30-parts">${ctx.parts(c)}</div>${ctx.M.reason(c)}</article>`;
+  return `<div class="sd30-arena"><section class="sd30-own"><div class="sd30-zone"><h3>자사 매체</h3><span>나라별 채널, 하나의 팀</span></div><div class="sd30-own-row">${ctx.own.map(c=>chamber(c)).join('')}</div></section><section class="sd30-managed"><div class="sd30-zone"><h3>운영대행</h3><span>성장 메달 = 전일 증가 인원 상위 3개</span></div><div class="sd30-managed-row">${ctx.agency.map(c=>chamber(c,true)).join('')}</div></section></div>`;
+ }
+ window.extraConcepts={...window.extraConcepts,30:arena};
+})();

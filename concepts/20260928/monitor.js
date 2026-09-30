@@ -54,15 +54,17 @@
     resizeObserver?.disconnect();resizeObserver=new ResizeObserver(fit);resizeObserver.observe(document.getElementById('board'));fit();
   }
   function cleanup(){resizeObserver?.disconnect();const board=document.getElementById('board');board.style.height='';board.style.width='';}
-  function current(){const n=Number(location.hash.slice(1));return n>=11&&n<=20?n:11;}
+  function range(){const h=location.hash.slice(1),n=Number(h);return h==='monitor'||(n>=11&&n<=20)?[11,20]:[21,30];}
+  function current(){const n=Number(location.hash.slice(1)),[first,last]=range();return n>=first&&n<=last?n:first;}
+  function next(step=1){const [first,last]=range(),n=current();return step>0?(n===last?first:n+1):(n===first?last:n-1);}
   function rerender(){window.renderConcept?.(String(current()));}
   function playback(){
     clearInterval(timer);timer=null;
-    if(state.playing)timer=setInterval(()=>{location.hash=String(current()===20?11:current()+1);},20000);
+    if(state.playing)timer=setInterval(()=>{location.hash=String(next());},20000);
     const b=document.getElementById('monitor-play');if(b)b.textContent=state.playing?'자동 순환 중 · 20초':'자동 순환';
   }
   async function present(){
-    if(Number(location.hash.slice(1))<11||Number.isNaN(Number(location.hash.slice(1)))){location.hash='11';window.renderConcept?.('11');}
+    if(!(Number(location.hash.slice(1))>=11&&Number(location.hash.slice(1))<=30)){const first=String(range()[0]);location.hash=first;window.renderConcept?.(first);}
     document.body.classList.add('presenting');fit();
     try{await document.documentElement.requestFullscreen();}catch{}fit();
   }
@@ -71,14 +73,14 @@
   document.addEventListener('click',e=>{
     if(e.target.closest('#monitor-demo')){state.demo=!state.demo;document.getElementById('monitor-demo').setAttribute('aria-pressed',String(state.demo));document.getElementById('monitor-demo').textContent=state.demo?'현재 데이터로 복귀':'비상·축하 효과 데모';rerender();}
     if(e.target.closest('#monitor-motion')){state.motion=!state.motion;document.getElementById('monitor-motion').textContent=state.motion?'움직임 일시정지':'움직임 재생';document.querySelector('#board')?.classList.toggle('motion-paused',!state.motion);}
-    if(e.target.closest('#monitor-play')){state.playing=!state.playing;if(state.playing&&!(Number(location.hash.slice(1))>=11&&Number(location.hash.slice(1))<=20)){location.hash='11';}playback();}
+    if(e.target.closest('#monitor-play')){state.playing=!state.playing;if(state.playing&&!(Number(location.hash.slice(1))>=11&&Number(location.hash.slice(1))<=30)){location.hash=String(range()[0]);}playback();}
     if(e.target.closest('#monitor-fullscreen'))present();
     if(e.target.closest('#monitor-exit'))exitPresent();
   });
   document.addEventListener('change',e=>{if(e.target.id==='monitor-rule'){state.rule=e.target.value;try{localStorage.setItem('kpi-monitor-rule-v1',state.rule);}catch{}rerender();}});
-  document.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select'))return;if(e.key==='Escape')exitPresent();if(document.body.classList.contains('presenting')&&['ArrowRight','ArrowLeft'].includes(e.key)){const n=current();location.hash=String(e.key==='ArrowRight'?(n===20?11:n+1):(n===11?20:n-1));}});
+  document.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select'))return;if(e.key==='Escape')exitPresent();if(document.body.classList.contains('presenting')&&['ArrowRight','ArrowLeft'].includes(e.key)){location.hash=String(next(e.key==='ArrowRight'?1:-1));}});
   document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)document.body.classList.remove('presenting');fit();});
   addEventListener('resize',fit);
-  addEventListener('hashchange',()=>{if(!['monitor',...Array.from({length:10},(_,i)=>String(i+11))].includes(location.hash.slice(1))){state.playing=false;playback();if(document.body.classList.contains('presenting'))exitPresent();}});
+  addEventListener('hashchange',()=>{if(!Array.from({length:20},(_,i)=>String(i+11)).includes(location.hash.slice(1))){state.playing=false;playback();if(document.body.classList.contains('presenting'))exitPresent();}});
   window.Monitor={state,make,status,prepare,legend,hydrate,cleanup,fit,icon,ruleLabel};
 })();

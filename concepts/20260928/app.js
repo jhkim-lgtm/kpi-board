@@ -18,7 +18,17 @@ const META={
   17:{name:'미션 컨트롤',desc:'비상·감소 채널을 먼저 발견하는 관제 화면.',title:'지금, 확인할 신호',recommend:true},
   18:{name:'챔피언 포디움',desc:'오늘의 성장 상위 채널을 시상대와 색종이로 축하.',title:'오늘의 성장 챔피언'},
   19:{name:'선셋 모자이크',desc:'핑크·오렌지 그라데이션과 다채로운 성장 모자이크.',title:'함께 만드는 성장의 색'},
-  20:{name:'프리즘 타워',desc:'빛이 오르는 열 개의 타워. 현재 높이는 고정.',title:'더 높은 곳을 향해'}
+  20:{name:'프리즘 타워',desc:'빛이 오르는 열 개의 타워. 현재 높이는 고정.',title:'더 높은 곳을 향해'},
+  21:{name:'챔피언 타워',desc:'성장 상위 세 채널의 시상대 안에 목표 타워.',title:'성장을 쌓고, 성과를 축하하다',recommend:true},
+  22:{name:'골든 리그',desc:'목표 진척순으로 세운 열 개의 황금빛 타워.',title:'목표에 가까운 순서대로'},
+  23:{name:'오로라 포디움',desc:'큰 챔피언 무대와 일곱 개의 성장 타워.',title:'오늘의 챔피언, 내일의 목표'},
+  24:{name:'프리즘 아레나',desc:'타워가 펼쳐진 경기장과 성장 상위 메달.',title:'성장의 아레나'},
+  25:{name:'국가별 스테이지',desc:'국기와 함께 크게 보는 자사 매체의 성장.',title:'나라별 채널, 빛나는 목표'},
+  26:{name:'듀얼 챔피언',desc:'왼쪽에는 성장 시상대, 오른쪽에는 목표 타워.',title:'오늘의 성과와 다음 목표'},
+  27:{name:'메달 스카이라인',desc:'도시처럼 솟은 타워에 오늘의 성장 메달.',title:'성장의 스카이라인'},
+  28:{name:'피니시 페스티벌',desc:'100% 피니시를 향해 빛이 오르는 축제.',title:'목표의 끝에서, 함께 축하하다'},
+  29:{name:'그로스 시상식',desc:'스포트라이트를 받는 챔피언과 타워 관람석.',title:'오늘의 성장을 시상합니다'},
+  30:{name:'월드 챔피언십',desc:'국기 타워와 운영대행 테라스를 한 무대에.',title:'함께 성장하는 월드 스테이지'}
 };
 const fmt=n=>Number(n).toLocaleString('ko-KR');
 const signed=n=>n==null?'—':(n>0?'+':n<0?'−':'')+fmt(Math.abs(n));
@@ -47,12 +57,14 @@ function context(data){
   return {own,agency,all:data.rows,total:own.reduce((s,r)=>s+r.current,0),totalDelta:own.every(r=>r.delta!=null)?own.reduce((s,r)=>s+r.delta,0):null,fmt,signed,change,meter,pct,parts,dateLabel:data.fetchedAt.slice(0,16).replace('T',' ')};
 }
 function render(view){
-  view=Object.hasOwn(META,view)?String(view):['overview','more','monitor'].includes(view)?view:'monitor';
-  const group=Number(view)>=11||view==='monitor'?'monitor':Number(view)>5||view==='more'?'more':'overview';
-  const isMonitor=group==='monitor',isGallery=['overview','more','monitor'].includes(view);
-  const source=SNAPSHOTS[group==='monitor'?2:group==='more'?1:0];
-  DATA=isMonitor?window.Monitor.prepare(source):source;ctx=context(DATA);ctx.M=window.Monitor.make(ctx);
-  const entries=Object.entries(META).filter(([n])=>group==='monitor'?Number(n)>=11:group==='more'?Number(n)>5&&Number(n)<=10:Number(n)<=5);
+  view=Object.hasOwn(META,view)?String(view):['overview','more','monitor','stage'].includes(view)?view:'stage';
+  const group=Number(view)>=21||view==='stage'?'stage':Number(view)>=11||view==='monitor'?'monitor':Number(view)>5||view==='more'?'more':'overview';
+  const isMonitor=group==='monitor'||group==='stage',isGallery=['overview','more','monitor','stage'].includes(view);
+  const source=SNAPSHOTS[group==='stage'?3:group==='monitor'?2:group==='more'?1:0];
+  DATA=isMonitor?window.Monitor.prepare(source):source;
+  if(group==='stage'){const flags={kr:'🇰🇷',jp:'🇯🇵',xhs:'🇨🇳',mfk:'🌏'};DATA.rows.forEach(c=>{if(flags[c.id])c.name=flags[c.id]+' '+c.name;});}
+  ctx=context(DATA);ctx.M=window.Monitor.make(ctx);
+  const entries=Object.entries(META).filter(([n])=>group==='stage'?Number(n)>=21:group==='monitor'?Number(n)>=11&&Number(n)<=20:group==='more'?Number(n)>5&&Number(n)<=10:Number(n)<=5);
   window.Monitor.cleanup();document.body.classList.toggle('monitor-collection',isMonitor);
   document.getElementById('monitor-controls').hidden=!isMonitor;
   document.querySelectorAll('.collections [data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===group)));
@@ -82,6 +94,6 @@ document.addEventListener('click',e=>{
   if(preview){select(preview.dataset.concept);window.scrollTo({top:0,behavior:'instant'});}
 });
 window.addEventListener('hashchange',()=>{if(SNAPSHOTS)render(location.hash.slice(1));});
-Promise.all(['data.json','data-20260930.json','data-monitor-20260930.json'].map(path=>fetch(path).then(r=>{if(!r.ok)throw Error(r.status);return r.json();}))).then(data=>{
+Promise.all(['data.json','data-20260930.json','data-monitor-20260930.json','data-stage-20260930.json'].map(path=>fetch(path).then(r=>{if(!r.ok)throw Error(r.status);return r.json();}))).then(data=>{
   SNAPSHOTS=data;render(location.hash.slice(1));window.conceptsReady=true;
 }).catch(()=>{document.getElementById('gallery').textContent='시안 데이터를 불러오지 못했습니다. 새로고침해주세요.';});
