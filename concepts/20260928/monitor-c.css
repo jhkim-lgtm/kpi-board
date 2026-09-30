@@ -1,0 +1,165 @@
+/* 17–19 share only a small metric-card skeleton; composition and motion differ. */
+.monitor-board .c-metric{position:relative;min-width:0;overflow:hidden;display:flex;flex-direction:column;padding:14px 16px;border:1px solid var(--line);border-radius:13px;background:var(--surface)}
+.monitor-board .c-metric-head{display:flex;align-items:flex-start;justify-content:space-between;gap:7px;min-height:22px}
+.monitor-board .c-metric h3{margin:0;font-size:14px;line-height:1.35;letter-spacing:-.025em;font-weight:720}
+.monitor-board .c-metric-numbers{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:8px}
+.monitor-board .c-metric-numbers>strong{font-size:32px;line-height:1.04;letter-spacing:-.045em}
+.monitor-board .c-metric .delta{font-size:17px;white-space:nowrap}
+.monitor-board .c-metric .delta small{font-size:9px;margin-left:4px}
+.monitor-board .c-metric .parts{font-size:9px;line-height:1.15;margin:5px 0 0;gap:8px;min-height:0}
+.monitor-board .c-metric .parts b{font-weight:700}
+.monitor-board .c-metric .m-track{margin-top:auto;padding-top:14px}
+.monitor-board .c-metric input[data-reason]{width:100%;min-width:0;box-sizing:border-box;font-size:10px;line-height:1.3;margin-top:5px}
+.monitor-board .c-zone-title{display:flex;align-items:center;justify-content:space-between;gap:10px;height:27px;margin:0 0 12px}
+.monitor-board .c-zone-title h3{font-size:17px;line-height:1;margin:0;letter-spacing:-.025em}
+.monitor-board .c-zone-title>span{font-size:11px;color:var(--muted)}
+
+/* 17 · Mission control: a persistent warning lane and a living radar. */
+.monitor-board.concept-17{--paper:#07131c;--surface:#102530;--ink:#e9f3f5;--muted:#97afb9;--line:#284550;--accent:#4dd9bc;--up:#70ecc2;--down:#ff9b88;background:radial-gradient(ellipse at 80% 60%,#0d2d35 0%,#07131c 70%)}
+.concept-17 .c-mission{height:600px;display:grid;grid-template-columns:362px minmax(0,1fr);gap:23px}
+.concept-17 .c-watch-panel{--c-warning:#ffc469;min-height:0;border:1px solid #8b6841;background:linear-gradient(150deg,#302720,#18212b);border-radius:16px;padding:16px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.concept-17 .c-signal-emergency .c-watch-panel{--c-warning:#ff756e;border-color:#ab5554;background:linear-gradient(150deg,#3b2027,#17222b)}
+.concept-17 .c-signal-clear .c-watch-panel{--c-warning:#63e2bc;border-color:#337e70;background:linear-gradient(150deg,#103d36,#17222b)}
+.concept-17 .c-watch-title{display:flex;align-items:center;gap:13px;padding:4px 0 18px;color:var(--c-warning)}
+.concept-17 .c-watch-title h3{font-size:19px;margin:4px 0 0;letter-spacing:-.03em}
+.concept-17 .c-watch-title small{font-size:9px;letter-spacing:.17em}
+.concept-17 .c-watch-title>b{margin-left:auto;font-size:28px;line-height:1}
+.concept-17 .c-beacon{position:relative;width:40px;height:40px;display:grid;place-items:center;flex-shrink:0}
+.concept-17 .c-beacon svg{width:24px;height:24px;position:relative;z-index:1;animation:c-beacon-nod 2.2s ease-in-out infinite}
+.concept-17 .c-beacon i,.concept-17 .c-beacon:after{content:'';position:absolute;inset:0;border:1px solid currentColor;border-radius:50%;animation:c-beacon-ping 2.2s ease-out infinite}
+.concept-17 .c-beacon:after{animation-delay:1.1s}
+.concept-17 .c-watch-list{min-height:0;flex:1;display:grid;grid-template-rows:repeat(var(--c-watch-count),minmax(0,1fr));gap:12px}
+.concept-17 .c-watch-card{--surface:#172b34;--line:#526055;padding:15px 14px;border-left:3px solid var(--c-warning)}
+.concept-17 .c-watch-card.m-emergency{border-left-color:#ff756e}
+.concept-17 .c-watch-card .c-metric-head{flex-wrap:wrap;gap:4px}
+.concept-17 .c-watch-card .c-metric-numbers>strong{font-size:33px}
+.concept-17 .c-flight-panel{min-height:0;padding-top:1px;display:flex;flex-direction:column}
+.concept-17 .c-flight-grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(var(--c-flight-rows),minmax(0,1fr));gap:14px}
+.concept-17 .c-flight-card{background:linear-gradient(125deg,#15323e,#10252f)}
+.concept-17 .c-flight-card.m-goal{border-color:#bb9f54;background:linear-gradient(135deg,#3d3928,#182c2f)}
+.concept-17 .c-flight-card.m-growing:before{content:'';position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 25px #55e2b518;animation:c-steady-glow 4s ease-in-out infinite;pointer-events:none}
+.concept-17 .c-signal-dot{display:inline-block;width:6px;height:6px;background:#6fe1b6;border-radius:50%;margin-right:4px;box-shadow:0 0 10px #6fe1b6;animation:c-steady-glow 2.5s ease-in-out infinite}
+.concept-17 .c-all-clear{align-self:center;text-align:center;color:#bbd5cf}
+.concept-17 .c-all-clear>strong{display:block;font-size:20px;margin-top:30px;color:#e5fff5}
+.concept-17 .c-all-clear p{font-size:13px;line-height:1.8;color:var(--muted)}
+.concept-17 .c-clear-radar{position:relative;width:180px;height:180px;margin:auto;border:1px solid #386b60;border-radius:50%;background:repeating-radial-gradient(circle,#204e4330 0 29px,#497d6440 30px 31px)}
+.concept-17 .c-clear-radar:before{content:'';position:absolute;inset:0;border-radius:50%;background:conic-gradient(transparent 270deg,#68e6b955 355deg,transparent 360deg);animation:c-radar-turn 6s linear infinite}
+.concept-17 .c-clear-radar b{position:absolute;inset:0;display:grid;place-items:center;font-size:35px;color:#8ff7cb}
+@keyframes c-beacon-ping{0%{transform:scale(.55);opacity:.65}100%{transform:scale(1.45);opacity:0}}
+@keyframes c-beacon-nod{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+@keyframes c-radar-turn{to{transform:rotate(360deg)}}
+@keyframes c-steady-glow{0%,100%{opacity:.55}50%{opacity:1}}
+
+/* 18 · The podium ranks only comparable, positive, daily changes. */
+.monitor-board.concept-18{--paper:#121029;--surface:#221c3c;--ink:#fff9ea;--muted:#c6bcd7;--line:#4d3b62;--accent:#f2c35e;--up:#8ae6b7;--down:#ffaea1;background:radial-gradient(ellipse at 50% 10%,#3f215e 0%,#19122f 55%,#100f25 100%)}
+.concept-18 .c-championship{height:600px;display:flex;flex-direction:column}
+.concept-18 .c-podium{height:277px;display:grid;grid-template-columns:1fr 1.16fr 1fr;gap:18px;align-items:end}
+.concept-18 .c-winner{height:239px;display:flex;position:relative;overflow:hidden;border:1px solid #77617f;border-radius:18px;background:linear-gradient(140deg,#443653,#272039);padding:22px 19px;box-sizing:border-box;gap:14px;align-items:center}
+.concept-18 .c-rank-1{height:277px;border-color:#e9c174;background:linear-gradient(145deg,#6d4733,#3d2b43 75%);box-shadow:0 0 45px #dfad4320}
+.concept-18 .c-rank-3{height:235px;background:linear-gradient(145deg,#573336,#29203c);border-color:#9f6b5d}
+.concept-18 .c-winner-copy{flex:1;min-width:0;position:relative;z-index:2}
+.concept-18 .c-winner-title{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.concept-18 .c-winner-title h3{margin:0;font-size:17px;letter-spacing:-.035em}
+.concept-18 .c-winner-title>span{white-space:nowrap;color:#eee1bb;font-size:10px}
+.concept-18 .c-winner-numbers{margin-top:11px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.concept-18 .c-winner-numbers>strong{font-size:37px;letter-spacing:-.05em}
+.concept-18 .c-winner-numbers>.delta{font-size:23px}
+.concept-18 .c-winner-numbers>.delta small{font-size:10px}
+.concept-18 .c-winner .parts{font-size:9px;margin:3px 0}
+.concept-18 .c-winner .m-track{margin-top:14px}
+.concept-18 .c-winner input[data-reason]{font-size:10px;width:100%;min-width:0;box-sizing:border-box;margin-top:6px}
+.concept-18 .c-podium-medal{flex-shrink:0;width:58px;height:79px;position:relative;color:#ddd6e2;align-self:center;animation:c-medal-float 4s ease-in-out infinite}
+.concept-18 .c-podium-medal svg{width:58px;height:58px;filter:drop-shadow(0 4px 8px #0004)}
+.concept-18 .c-podium-medal b{display:block;text-align:center;font-size:18px;font-weight:850;margin-top:0}
+.concept-18 .c-rank-1 .c-podium-medal{width:76px;height:101px;color:#ffda84;animation-delay:-1s}
+.concept-18 .c-rank-1 .c-podium-medal svg{width:76px;height:76px}
+.concept-18 .c-rank-3 .c-podium-medal{color:#e1a488;animation-delay:-2s}
+.concept-18 .c-podium-confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:.8}
+.concept-18 .c-podium-confetti i{position:absolute;left:calc(var(--j)*8.8%);top:-10px;width:4px;height:8px;background:#ffdc8d;animation:c-confetti-drift calc(6s + var(--j)*.12s) linear infinite;animation-delay:calc(var(--j)*-.77s);border-radius:1px}
+.concept-18 .c-podium-confetti i:nth-child(3n){background:#ce98ed;width:5px;height:5px}
+.concept-18 .c-podium-confetti i:nth-child(3n+1){background:#a3efd0}
+.concept-18 .c-other-title{margin:20px 0 10px;height:23px}
+.concept-18 .c-podium-rest{display:grid;grid-template-columns:repeat(var(--c-rest-count),minmax(0,1fr));gap:12px;flex:1;min-height:0}
+.concept-18 .c-small-card{padding:13px 12px;border-radius:12px;background:linear-gradient(150deg,#2a2243,#1e1c34)}
+.concept-18 .c-small-card .c-metric-head{flex-direction:column;gap:6px;min-height:47px}
+.concept-18 .c-small-card h3{font-size:12px;letter-spacing:-.03em}
+.concept-18 .c-small-card .c-metric-numbers{display:block;margin-top:11px}
+.concept-18 .c-small-card .c-metric-numbers>strong{font-size:29px;display:block}
+.concept-18 .c-small-card .delta{display:block;font-size:19px;margin-top:8px}
+.concept-18 .c-small-card .delta small{font-size:8px;margin-left:4px}
+.concept-18 .c-small-card .m-track{padding-top:17px}
+.concept-18 .c-small-card .parts{font-size:8px;gap:3px;flex-wrap:wrap}
+.concept-18 .c-no-winner{grid-column:1/-1;color:var(--muted);font-size:24px;text-align:center;padding:100px 0}
+@keyframes c-medal-float{0%,100%{transform:translateY(3px) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+@keyframes c-confetti-drift{0%{transform:translate(0,-10px) rotate(0deg);opacity:0}10%{opacity:.8}85%{opacity:.7}100%{transform:translate(25px,300px) rotate(300deg);opacity:0}}
+
+/* 19 · Warm, asymmetric mosaics with a slowly orbiting sunset. */
+.monitor-board.concept-19{--paper:#241133;--surface:#643058;--ink:#fff7ed;--muted:#f3d3e8;--line:#ffffff30;--accent:#ffd180;--up:#d7ffbd;--down:#ffdad2;background:linear-gradient(125deg,#4f2145,#2e163f 55%,#241838)}
+.concept-19 .c-mosaic{display:grid;grid-template-columns:2fr 3fr;gap:19px;height:600px}
+.concept-19 .c-mosaic-own,.concept-19 .c-mosaic-agency{display:flex;flex-direction:column;min-width:0}
+.concept-19 .c-zone-title{margin-bottom:10px;height:23px}
+.concept-19 .c-zone-title>span{font-size:9px;letter-spacing:.12em}
+.concept-19 .c-own-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:139px 1fr 1fr;gap:12px;flex:1;min-height:0}
+.concept-19 .c-total-tile{grid-column:1/-1;border-radius:19px;background:linear-gradient(105deg,#ffba77,#ff907a 55%,#e98fab);color:#4f173a;position:relative;overflow:hidden;padding:13px 23px;display:flex;align-items:center}
+.concept-19 .c-total-tile>div:first-child{position:relative;z-index:2}
+.concept-19 .c-total-tile span{font-size:13px;font-weight:600}
+.concept-19 .c-total-tile strong{font-size:58px;letter-spacing:-.055em;line-height:1.05;display:block;margin:5px 0 3px}
+.concept-19 .c-total-tile .delta{color:#3e4931;font-size:24px}
+.concept-19 .c-total-tile .delta small{font-size:11px;color:#664653}
+.concept-19 .c-sunset{position:absolute;width:195px;height:195px;right:-20px;top:-8px;border-radius:50%;border:1px solid #7d276d30;animation:c-sunset-spin 35s linear infinite}
+.concept-19 .c-sunset i{position:absolute;inset:17px;border:1px solid #7d276d40;border-radius:50%}
+.concept-19 .c-sunset i:nth-child(2){inset:36px}.concept-19 .c-sunset i:nth-child(3){inset:55px;background:#ffe0a15c}
+.concept-19 .c-sunset svg{position:absolute;width:42px;height:42px;color:#8c426a;top:0;left:80px;animation:c-star-breathe 4s ease-in-out infinite}
+.concept-19 .c-agency-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:1fr 1fr;gap:12px;flex:1;min-height:0}
+.concept-19 .c-metric{border:0;border-radius:17px;padding:14px 16px;box-shadow:inset 0 1px 0 #ffffff25}
+.concept-19 .c-metric-head{flex-wrap:wrap;gap:5px}
+.concept-19 .c-metric h3{font-size:13px}
+.concept-19 .c-metric-numbers>strong{font-size:31px}
+.concept-19 .c-metric .delta{font-size:16px}
+.concept-19 .c-metric .delta small{font-size:8px;margin-left:3px}
+.concept-19 .c-metric .m-track{padding-top:13px}
+.concept-19 .c-metric input[data-reason]{color:#fff8f0;background:#1a123324;border-color:#fff3}
+.concept-19 .c-metric input[data-reason]::placeholder{color:#fff9}
+.concept-19 .c-color-0{background:linear-gradient(130deg,#a6477a,#89385f)}
+.concept-19 .c-color-1{background:linear-gradient(130deg,#b74449,#913d55)}
+.concept-19 .c-color-2{background:linear-gradient(130deg,#794ab4,#684399)}
+.concept-19 .c-color-3{background:linear-gradient(130deg,#93418e,#72387c)}
+.concept-19 .c-color-4{background:linear-gradient(130deg,#cf6842,#b15040)}
+.concept-19 .c-color-5{background:linear-gradient(130deg,#9a4f77,#834264)}
+.concept-19 .c-color-6{background:linear-gradient(130deg,#6851ac,#584291)}
+.concept-19 .c-color-7{background:linear-gradient(130deg,#9b4580,#803870)}
+.concept-19 .c-color-8{background:linear-gradient(130deg,#744faf,#624198)}
+.concept-19 .c-color-9{background:linear-gradient(130deg,#a44161,#8b3558)}
+.concept-19 .c-agency-tiles .c-metric-head{min-height:45px;align-content:flex-start}
+.concept-19 .c-agency-tiles .c-metric-numbers{display:block;margin-top:12px}
+.concept-19 .c-agency-tiles .c-metric-numbers>strong{font-size:37px;display:block}
+.concept-19 .c-agency-tiles .delta{display:block;margin-top:9px;font-size:19px}
+.concept-19 .c-mosaic-ribbon{height:88px;box-sizing:border-box;margin-top:12px;padding:16px 24px;border-radius:17px;background:linear-gradient(100deg,#573e70,#854a73);display:flex;gap:22px;align-items:center;overflow:hidden;position:relative}
+.concept-19 .c-mosaic-ribbon strong{display:block;font-size:20px;letter-spacing:-.03em;font-weight:650}
+.concept-19 .c-mosaic-ribbon span{display:block;margin-top:6px;font-size:11px;color:#eedbe8}
+.concept-19 .c-ribbon-rocket{color:#ffcd88;animation:c-rocket-wiggle 3.5s ease-in-out infinite}
+.concept-19 .c-ribbon-rocket svg{width:45px;height:45px}
+.concept-19 .c-ribbon-stars{margin-left:auto;color:#ffca99;font-size:30px;display:flex;gap:19px;align-items:center;animation:c-star-breathe 3.5s ease-in-out infinite}
+.concept-19 .c-ribbon-stars span{font-size:23px;margin:0;color:#d6a2e5}
+@keyframes c-sunset-spin{to{transform:rotate(360deg)}}
+@keyframes c-star-breathe{0%,100%{opacity:.5;transform:scale(.86)}50%{opacity:1;transform:scale(1.07)}}
+@keyframes c-rocket-wiggle{0%,100%{transform:translate(-4px,4px) rotate(-3deg)}50%{transform:translate(5px,-5px) rotate(5deg)}}
+@media(prefers-reduced-motion:reduce){.monitor-board .c-beacon svg,.monitor-board .c-beacon i,.monitor-board .c-beacon:after,.monitor-board .c-flight-card:before,.monitor-board .c-signal-dot,.monitor-board .c-clear-radar:before,.monitor-board .c-podium-medal,.monitor-board .c-podium-confetti i,.monitor-board .c-sunset,.monitor-board .c-sunset svg,.monitor-board .c-ribbon-rocket,.monitor-board .c-ribbon-stars{animation:none!important}}
+
+.concept-19 .c-own-tiles .m-reasons{margin-top:3px;gap:2px}.concept-19 .c-own-tiles input[data-reason]{height:16px;line-height:14px;padding:0 4px;margin-top:0;font-size:9px}.concept-18 .c-winner .m-reasons{gap:2px}.concept-18 .c-winner input[data-reason]{height:17px;line-height:15px;margin-top:2px;padding:0 4px}
+/* Dense watch lane: keep its editable reason inside every card. */
+.concept-17 .c-watch-card{padding:10px 14px}
+.concept-17 .c-watch-card .c-metric-numbers{margin-top:5px}
+.concept-17 .c-watch-card .m-track{padding-top:10px}
+.concept-17 .c-watch-card .m-reasons{min-height:17px;margin-top:4px;gap:4px}
+.concept-17 .c-watch-card input[data-reason]{height:17px;line-height:15px;padding:0;margin-top:0;font-size:10px}
+/* Reserve a full icon lane above the XHS progress line. */
+.concept-17 .c-mission{height:630px}
+.concept-17 .c-flight-card{padding:12px 14px}
+.concept-17 .c-flight-card .c-metric-numbers{margin-top:6px}
+.concept-17 .c-flight-card .m-reasons{min-height:18px;margin-top:5px;gap:7px}
+.concept-17 .c-flight-card input[data-reason]{height:18px;line-height:16px;padding:0;margin-top:0;font-size:10px}
+.concept-17 .c-flight-card[data-channel="xhs"] .m-track{padding-top:21px}
+.monitor-board.concept-17 .board-inner,.monitor-board.concept-18 .board-inner,.monitor-board.concept-19 .board-inner{background:inherit}
+
+.concept-17 .c-watch-card.m-watch{border-left-color:#ffc469}

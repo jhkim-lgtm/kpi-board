@@ -1,0 +1,6 @@
+(() => {
+ function towers(ctx){
+   return `<div class="d20-headers"><span>자사 매체 / 04</span><span>운영대행 / 06</span></div><div class="d20-towers">${ctx.all.map((c,i)=>`<article data-channel="${c.id}" class="d20-tower m-${ctx.M.status(c).key}" style="--phase:${-i*1.3}s">${ctx.M.confetti(c)}<div class="d20-name"><span>${String(i+1).padStart(2,'0')}</span><h3>${c.name}</h3></div>${ctx.M.badge(c)}<strong class="d20-value num">${ctx.fmt(c.current)}</strong>${ctx.change(c)}<div class="d20-chart" role="meter" aria-label="${c.name} 현재 목표 진척" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${c.progress.toFixed(1)}" style="--level:${c.progress}%"><div class="d20-grid" aria-hidden="true">${Array.from({length:11},(_,j)=>`<i style="bottom:${j*10}%"></i>`).join('')}</div><div class="d20-liquid"><i></i></div><div class="d20-position"><b>${ctx.pct(c)}</b><i></i></div><div class="d20-beam" aria-hidden="true">${ctx.M.icon(c.id==='rr'?'car':'rocket')}</div><div class="d20-limits" aria-hidden="true"><span>100%</span><span>0%</span></div></div><div class="d20-goal">목표 <b>${ctx.fmt(c.goal)}</b></div><div class="d20-parts">${ctx.parts(c)}</div>${ctx.M.reason(c)}</article>`).join('')}</div>`;
+ }
+ window.extraConcepts={...window.extraConcepts,20:towers};
+})();

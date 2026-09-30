@@ -4,36 +4,58 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>1%CLUB · KPI 디자인 시안 10</title>
+  <title>1%CLUB · KPI 디자인 시안 20</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="alternates.css">
   <link rel="stylesheet" href="new-67.css">
   <link rel="stylesheet" href="new-89.css">
   <link rel="stylesheet" href="more.css">
+  <link rel="stylesheet" href="monitor.css">
+  <link rel="stylesheet" href="monitor-a.css">
+  <link rel="stylesheet" href="monitor-b.css">
+  <link rel="stylesheet" href="monitor-c.css">
+  <link rel="stylesheet" href="monitor-d.css">
+
 </head>
 <body>
   <header class="review-head">
-    <div><p class="eyebrow">1%CLUB / DESIGN REVIEW</p><h1>중요한 숫자만, 더 분명하게.</h1><p class="review-sub">새로운 시안 5개를 추가했습니다. 원하는 구성을 눌러 비교해보세요.</p></div>
+    <div><p class="eyebrow">1%CLUB / DESIGN REVIEW</p><h1>성장을 보여주는 열 가지 움직임.</h1><p class="review-sub">회사 모니터를 위한 애니메이션 시안 11–20. 열어서 움직임을 확인해보세요.</p></div>
     <a class="live-link" href="../../">운영 대시보드 ↗</a>
   </header>
   <nav class="collections" aria-label="시안 묶음 선택">
-    <button data-view="more">추가 시안 06–10 <span>NEW</span></button>
+    <button data-view="monitor">모니터 시안 11–20 <span>ANIMATED</span></button>
+    <button data-view="more">시안 06–10</button>
     <button data-view="overview">기존 시안 01–05</button>
   </nav>
   <nav class="tabs" aria-label="시안 선택"></nav>
   <main>
+    <div id="monitor-controls" class="monitor-controls" hidden>
+      <button id="monitor-fullscreen">전체화면으로 보기</button>
+      <button id="monitor-play">자동 순환</button>
+      <button id="monitor-motion">움직임 일시정지</button>
+      <button id="monitor-demo" aria-pressed="false">비상·축하 효과 데모</button>
+      <label for="monitor-rule">비상 기준</label>
+      <select id="monitor-rule"><option value="one-percent">전일 1% 이상 감소</option><option value="any-drop">전일 한 명 이상 감소</option><option value="three-days">3일 연속 감소</option></select>
+      <p class="monitor-notice" id="monitor-notice">디자인 시안 · 표시된 조회 시점 데이터 · 문구는 이 브라우저에 저장 · 전체화면에서 ← → 전환 / Esc 종료</p>
+    </div>
     <section id="gallery" class="gallery" aria-label="대시보드 시안 미리보기"></section>
     <div id="detail" hidden>
       <div class="concept-caption"><div><span id="concept-number"></span><h2 id="concept-title"></h2><p id="concept-description"></p></div><a id="image-link" href="#" target="_blank" rel="noopener">이미지 크게 보기 ↗</a></div>
       <section id="board" class="board" aria-label="선택한 대시보드 시안"></section>
     </div>
-    <p class="review-foot">디자인 검토용 · 시안별 데이터 조회일 표시 · 팔로워 수, 증감, 목표 진척을 중심으로 구성했습니다.</p>
+    <p class="review-foot">디자인 검토용 · 시안별 데이터 조회일 표시 · 모니터 시안은 열어서 애니메이션·상태색·축하 효과를 확인하세요.</p>
   </main>
   <script src="alternates.js"></script>
   <script src="new-67.js"></script>
   <script src="new-89.js"></script>
   <script src="more.js"></script>
+  <script src="monitor.js"></script>
+  <script src="monitor-a.js"></script>
+  <script src="monitor-b.js"></script>
+  <script src="monitor-c.js"></script>
+  <script src="monitor-d.js"></script>
   <script src="app.js"></script>
+  <button id="monitor-exit" class="monitor-exit">전체화면 종료 · Esc</button>
 </body>
 </html>
