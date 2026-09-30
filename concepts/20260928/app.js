@@ -3,7 +3,12 @@ const META={
   2:{name:'한눈에 비교',desc:'열 개 채널을 같은 기준으로 빠르게 비교.',title:'숫자로 보는 채널'},
   3:{name:'목표 트랙',desc:'목표까지 얼마나 왔는지, 얼마나 남았는지.',title:'목표까지의 거리'},
   4:{name:'증감 보드',desc:'어디에서 늘고, 어디에서 줄었는지 먼저.',title:'오늘의 변화'},
-  5:{name:'TV 전광판',desc:'멀리서도 읽히는 큰 숫자와 최소한의 정보.',title:'채널 현황.'}
+  5:{name:'TV 전광판',desc:'멀리서도 읽히는 큰 숫자와 최소한의 정보.',title:'채널 현황.'},
+  6:{name:'타이포 보드',desc:'채널마다 같은 공간. 큰 팔로워 숫자에 집중.',title:'팔로워, 한눈에.',recommend:true},
+  7:{name:'목표 컬럼',desc:'위로 채워지는 그래프로 목표까지의 높이를 비교.',title:'목표를 향해, 한 칸씩.'},
+  8:{name:'롤스로이스 집중',desc:'3만 명까지의 진척을 화면의 중심에.',title:'롤스로이스, 30,000까지.'},
+  9:{name:'변화 분류',desc:'증가·유지·감소를 나눠 오늘 확인할 채널부터.',title:'오늘, 무엇이 달라졌나.'},
+  10:{name:'한 장 리포트',desc:'여백과 숫자로 정리한 간결한 운영 보고서.',title:'채널 운영 리포트'}
 };
 const fmt=n=>Number(n).toLocaleString('ko-KR');
 const signed=n=>n==null?'—':(n>0?'+':n<0?'−':'')+fmt(Math.abs(n));
@@ -25,28 +30,42 @@ function television(ctx){
   const cell=c=>`<article class="tv-cell"><div class="channel-name">${c.name}</div><div class="tv-current num">${fmt(c.current)}</div>${change(c)}${meter(c)}${goal(c)}${parts(c)}</article>`;
   return heading('자사 매체','OWN CHANNELS')+`<div class="tv-own">${ctx.own.map(cell).join('')}</div>`+heading('운영대행','MANAGED CHANNELS')+`<div class="tv-agency">${ctx.agency.map(cell).join('')}</div>`;
 }
-let DATA,ctx;
+let DATA,ctx,SNAPSHOTS;
+const number=n=>String(n).padStart(2,'0');
+function context(data){
+  const own=data.rows.filter(r=>r.group==='own'),agency=data.rows.filter(r=>r.group==='agency');
+  return {own,agency,all:data.rows,total:own.reduce((s,r)=>s+r.current,0),totalDelta:own.every(r=>r.delta!=null)?own.reduce((s,r)=>s+r.delta,0):null,fmt,signed,change,meter,pct,parts,dateLabel:data.fetchedAt.slice(0,16).replace('T',' ')};
+}
 function render(view){
-  view=Object.hasOwn(META,view)?String(view):'overview';
-  document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));
-  document.getElementById('gallery').hidden=view!=='overview';
-  document.getElementById('detail').hidden=view==='overview';
-  if(view==='overview') return;
+  view=Object.hasOwn(META,view)?String(view):view==='overview'?'overview':'more';
+  const isNew=view==='more'||Number(view)>5, isGallery=view==='more'||view==='overview';
+  DATA=SNAPSHOTS[isNew?1:0];ctx=context(DATA);
+  const group=isNew?'more':'overview';
+  const entries=Object.entries(META).filter(([n])=>isNew?Number(n)>5:Number(n)<=5);
+  document.querySelectorAll('.collections [data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===group)));
+  document.querySelector('.tabs').innerHTML=`<button data-view="${group}" aria-pressed="${isGallery}">5개 비교</button>`+entries.map(([n,m])=>`<button data-view="${n}" aria-pressed="${view===n}"><span>${number(n)}</span>${m.name}</button>`).join('');
+  document.getElementById('gallery').hidden=!isGallery;
+  document.getElementById('detail').hidden=isGallery;
+  if(isGallery){
+    document.getElementById('gallery').innerHTML=entries.map(([n,m])=>`<article class="preview"><button data-concept="${n}" aria-label="${n}번 ${m.name} 시안 열기"><img loading="lazy" src="previews/${number(n)}.png" alt="${n}번 ${m.name} 대시보드 시안" width="1440" height="850"><div class="preview-meta"><span class="preview-index">${number(n)}</span><div><h2>${m.name}${m.recommend?'<span class="recommend">추천</span>':''}</h2><p>${m.desc}</p></div></div></button></article>`).join('');
+    return;
+  }
   const m=META[view], renderers={1:core,2:comparison,5:television,...window.extraConcepts};
-  document.getElementById('concept-number').textContent=String(view).padStart(2,'0');
+  document.getElementById('concept-number').textContent=number(view);
   document.getElementById('concept-title').textContent=m.name;
   document.getElementById('concept-description').textContent=m.desc;
-  document.getElementById('image-link').href=`previews/0${view}.png`;
+  document.getElementById('image-link').href=`previews/${number(view)}.png`;
   const board=document.getElementById('board');board.className='board concept-'+view;
-  board.innerHTML=`<div class="board-inner"><header class="board-head"><div><div class="brand">1%CLUB</div><h2>${m.title}</h2><div class="asof">${DATA.dataDate.replaceAll('-','.')} 기준</div></div><div class="overview"><span>자사 매체 팔로워 합계</span><strong class="num">${fmt(ctx.total)}</strong>${change({delta:ctx.totalDelta,period:'전일'})}</div></header><div class="content">${renderers[view](ctx)}</div><footer class="board-foot"><span>롤스로이스 서울 0% = 운영 시작월 말 22,012명 · 카카오·유튜브 증감 = 8월 전월 대비</span><span>데이터 조회 ${ctx.dateLabel} · 시안 ${String(view).padStart(2,'0')}</span></footer></div>`;
+  const month=ctx.all.find(r=>r.id==='kakao').period;
+  board.innerHTML=`<div class="board-inner"><header class="board-head"><div><div class="brand">1%CLUB</div><h2>${m.title}</h2><div class="asof">${DATA.dataDate.replaceAll('-','.')} 기준</div></div><div class="overview"><span>자사 매체 팔로워 합계</span><strong class="num">${fmt(ctx.total)}</strong>${change({delta:ctx.totalDelta,period:'전일'})}</div></header><div class="content">${renderers[view](ctx)}</div><footer class="board-foot"><span>롤스로이스 서울 0% = 운영 시작월 말(2026.02) 22,012명 · 카카오·유튜브 증감 = ${month}</span><span>데이터 조회 ${ctx.dateLabel} · 시안 ${number(view)}</span></footer></div>`;
 }
 function select(view){location.hash=view;render(view);}
-document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>select(b.dataset.view)));
-window.addEventListener('hashchange',()=>{if(ctx)render(location.hash.slice(1));});
-fetch('data.json').then(r=>{if(!r.ok)throw Error(r.status);return r.json();}).then(data=>{
-  DATA=data;const own=data.rows.filter(r=>r.group==='own'),agency=data.rows.filter(r=>r.group==='agency');
-  ctx={own,agency,all:data.rows,total:own.reduce((s,r)=>s+r.current,0),totalDelta:own.every(r=>r.delta!=null)?own.reduce((s,r)=>s+r.delta,0):null,fmt,signed,change,meter,pct,parts,dateLabel:data.fetchedAt.slice(0,16).replace('T',' ')};
-  document.getElementById('gallery').innerHTML=Object.entries(META).map(([n,m])=>`<article class="preview"><button data-concept="${n}" aria-label="${n}번 ${m.name} 시안 열기"><img loading="lazy" src="previews/0${n}.png" alt="${n}번 ${m.name} 대시보드 시안" width="1440" height="850"><div class="preview-meta"><span class="preview-index">0${n}</span><div><h2>${m.name}${m.recommend?'<span class="recommend">추천</span>':''}</h2><p>${m.desc}</p></div></div></button></article>`).join('');
-  document.querySelectorAll('[data-concept]').forEach(b=>b.addEventListener('click',()=>{select(b.dataset.concept);window.scrollTo({top:0,behavior:'instant'});}));
-  render(location.hash.slice(1));window.conceptsReady=true;
+document.addEventListener('click',e=>{
+  const tab=e.target.closest('[data-view]'),preview=e.target.closest('[data-concept]');
+  if(tab)select(tab.dataset.view);
+  if(preview){select(preview.dataset.concept);window.scrollTo({top:0,behavior:'instant'});}
+});
+window.addEventListener('hashchange',()=>{if(SNAPSHOTS)render(location.hash.slice(1));});
+Promise.all(['data.json','data-20260930.json'].map(path=>fetch(path).then(r=>{if(!r.ok)throw Error(r.status);return r.json();}))).then(data=>{
+  SNAPSHOTS=data;render(location.hash.slice(1));window.conceptsReady=true;
 }).catch(()=>{document.getElementById('gallery').textContent='시안 데이터를 불러오지 못했습니다. 새로고침해주세요.';});
