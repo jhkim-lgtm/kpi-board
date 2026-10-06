@@ -1,0 +1,16 @@
+/* Second collection: ten new spatial metaphors; original views keep their URLs. */
+.batch-tabs{max-width:1540px;margin:0 auto 26px;padding:0 40px;display:flex;gap:10px;align-items:center}
+.batch-tabs>a{display:flex;align-items:center;gap:12px;min-height:46px;border:1px solid #ffffff24;border-radius:7px;padding:12px 18px;font-size:13px;color:#a9bda0}
+.batch-tabs>a[aria-current=page]{color:#eef9e4;border-color:#b7e29566;background:#b7e29512}
+.batch-tabs b{font-size:9px;letter-spacing:1px;background:#c1ed98;color:#213117;border-radius:3px;padding:3px 5px}
+.palette-11{--bg:#f0e6df;--ink:#442b27;--muted:#7a665e;--line:#442b2728;--accent:#ad573a;--down:#a63848;color-scheme:light}
+.palette-12{--bg:#171328;--ink:#f3ecff;--muted:#b7a9cf;--line:#dac8ff28;--accent:#d0affa;--down:#ffb1bb}
+.palette-13{--bg:#edf0e7;--ink:#243d32;--muted:#637368;--line:#243d322a;--accent:#3c7252;--down:#ab4d3d;color-scheme:light}
+.palette-14{--bg:#2c1b22;--ink:#fbecdb;--muted:#c4a49c;--line:#eecba52a;--accent:#e8b57d;--down:#ffa3ac}
+.palette-15{--bg:#0c2027;--ink:#e7faf3;--muted:#99bebd;--line:#9fd5d92b;--accent:#8be3d1;--down:#f5abaf}
+.palette-16{--bg:#141616;--ink:#f4ecd9;--muted:#b4b4a2;--line:#bcbcab30;--accent:#ffd16b;--down:#f2a9a5}
+.palette-17{--bg:#2a2235;--ink:#fff3e1;--muted:#c2b0d0;--line:#dfcff42c;--accent:#d6c3fa;--down:#ffafad}
+.palette-18{--bg:#ecece6;--ink:#1b3c4a;--muted:#637782;--line:#234a622a;--accent:#236983;--down:#a9493e;color-scheme:light}
+.palette-19{--bg:#eef0f6;--ink:#203769;--muted:#637293;--line:#29457e28;--accent:#345acd;--down:#a83e55;color-scheme:light}
+.palette-20{--bg:#132820;--ink:#f3f2d5;--muted:#abc0a6;--line:#d6e4b228;--accent:#daec91;--down:#f8aa91}
+@media(max-width:800px){.batch-tabs{padding:0 24px;gap:8px;flex-wrap:wrap}.batch-tabs>a{font-size:11px;padding:10px 13px;gap:8px}}
