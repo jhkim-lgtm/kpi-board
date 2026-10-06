@@ -41,3 +41,12 @@
 @media(prefers-reduced-motion:reduce){.background-art::before,.background-art::after,.background-art>i{animation:none!important;will-change:auto}}
 @media(max-width:640px){.app-header{flex-wrap:wrap}.wordmark{flex:1}.app-actions{width:100%;justify-content:flex-end;margin-top:2px}.app-actions>a{margin-right:auto}.app-actions>button{font-size:10px}}
 #motion:disabled{cursor:default}
+/* A dedicated monitor URL opens directly in the fitted display. */
+.monitor-toolbar{position:fixed;right:14px;bottom:8px;z-index:8;padding:6px;border-radius:9px;background:#141824df;border:1px solid #ffffff18;opacity:.12;transition:opacity .2s;color:#f0f0f5;font-size:10px}
+.monitor-toolbar:hover,.monitor-toolbar:focus-within{opacity:1}.monitor-toolbar>button,.monitor-toolbar>a{font-size:10px;padding:7px 9px}.monitor-toolbar #refresh{display:none}
+.monitor-status{position:fixed;bottom:5px;left:13px;z-index:4;font-size:8px;line-height:1.4;color:#abb2c7;background:#141824a8;padding:3px 6px;border-radius:3px;pointer-events:none}
+body.force-motion .background-art::before{animation:var(--ambient-before,none)!important}
+body.force-motion .background-art::after{animation:var(--ambient-after,none)!important}
+body.force-motion .background-art>i{animation:var(--ambient-arch,none)!important}
+body.motion-paused .background-art::before,body.motion-paused .background-art::after,body.motion-paused .background-art>i,body.force-motion.motion-paused .background-art::before,body.force-motion.motion-paused .background-art::after,body.force-motion.motion-paused .background-art>i{animation-play-state:paused!important}
+@media(max-width:640px){.monitor-toolbar{width:auto;left:10px;right:10px;bottom:8px;justify-content:center;opacity:.8}.monitor-toolbar>a{margin-right:0}.monitor-mode{padding-bottom:58px}.monitor-status{bottom:52px}.monitor-mode .board{min-height:100vh}.monitor-mode .board-inner{padding-top:23px}}

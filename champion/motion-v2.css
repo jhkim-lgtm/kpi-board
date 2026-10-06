@@ -1,0 +1,148 @@
+/* Load after styles.css. All motion is confined to the background layer.
+   Fixed opacity and moving edges make the change visible within 2–3 seconds.
+   Full shorthands are exposed for the application's explicit motion override. */
+.background-art {
+  --ambient-before: none;
+  --ambient-after: none;
+  --ambient-arch: none;
+}
+.theme-1 .background-art {
+  --ambient-before: champion-light 12s linear -4s infinite alternate;
+  --ambient-after: champion-light 14s linear -8s infinite alternate-reverse;
+  --ambient-arch: champion-arch 12s linear -3s infinite alternate;
+}
+.theme-2 .background-art {
+  --ambient-before: champion-light 12s linear -6s infinite alternate;
+  --ambient-arch: champion-arch 10s linear -3s infinite alternate;
+}
+.theme-3 .background-art {
+  --ambient-before: champion-grid 10s linear -3s infinite;
+  --ambient-after: champion-sweep 12s linear -5s infinite alternate;
+}
+.theme-4 .background-art {
+  --ambient-before: champion-sweep 11s linear -4s infinite alternate;
+  --ambient-after: champion-sweep 14s linear -8s infinite alternate-reverse;
+}
+.theme-5 .background-art {
+  --ambient-before: champion-daylight 12s linear -4s infinite alternate;
+  --ambient-after: champion-daylight 14s linear -9s infinite alternate-reverse;
+}
+.background-art::before,
+.background-art::after {
+  opacity: 1;
+  will-change: transform;
+  animation-timing-function: linear;
+}
+
+/* 01 — two broad lights travel across a plum stage. */
+.theme-1 .background-art::before {
+  inset: -220px -240px -120px;
+  background:
+    radial-gradient(ellipse 480px 310px at 35% 29%, #bb84ed75, #9565c92b 48%, transparent 74%);
+  animation: var(--ambient-before);
+}
+.theme-1 .background-art::after {
+  inset: -180px -240px -100px;
+  background:
+    radial-gradient(ellipse 360px 260px at 71% 25%, #e6be7659, #ac7e4d1c 51%, transparent 76%);
+  animation: var(--ambient-after);
+}
+.theme-1 .background-art > i:first-child {
+  display: block;
+  position: absolute;
+  width: 980px;
+  height: 680px;
+  left: calc(50% - 490px);
+  top: 36px;
+  border: 1px solid #d2adf34d;
+  border-radius: 50%;
+  animation: var(--ambient-arch);
+  will-change: transform;
+}
+
+/* 02 — translated architectural outlines, with a soft teal light behind them. */
+.theme-2 .background-art > i {
+  border-color: #afdcd66b;
+  opacity: 1;
+  animation: var(--ambient-arch);
+  will-change: transform;
+}
+.theme-2 .background-art > i:nth-child(2) {
+  --ambient-arch: champion-arch 12s linear -7s infinite alternate-reverse;
+  animation: var(--ambient-arch);
+}
+.theme-2 .background-art > i:nth-child(3) {
+  --ambient-arch: champion-arch 14s linear -10s infinite alternate;
+  animation: var(--ambient-arch);
+}
+.theme-2 .background-art::before {
+  inset: -220px -240px -120px;
+  background: radial-gradient(ellipse 490px 340px at 48% 23%, #5eaf9f63, transparent 74%);
+  animation: var(--ambient-before);
+}
+
+/* 03 — a moving drafting grid and one wide blue light. The grid wraps exactly. */
+.theme-3 .background-art { background: none; }
+.theme-3 .background-art::before {
+  inset: -190px;
+  background:
+    linear-gradient(#a3c7ff24 1px, transparent 1px),
+    linear-gradient(90deg, #a3c7ff24 1px, transparent 1px);
+  background-size: 38px 38px;
+  animation: var(--ambient-before);
+}
+.theme-3 .background-art::after {
+  inset: -220px -240px -120px;
+  background:
+    linear-gradient(117deg, transparent 35%, #a9cdff0d 39%, #a9cdff52 45%, #a9cdff0d 51%, transparent 55%);
+  animation: var(--ambient-after);
+}
+
+/* 04 — a broad satin reflection passes through the fixed charcoal panels. */
+.theme-4 .background-art::before {
+  inset: -220px -300px -160px;
+  background:
+    linear-gradient(110deg, transparent 31%, #d2e1d30d 37%, #c3d6ca42 44%, #d2e1d319 50%, transparent 57%);
+  animation: var(--ambient-before);
+}
+.theme-4 .background-art::after {
+  inset: -180px -240px -120px;
+  background:
+    linear-gradient(110deg, transparent 47%, #c0d3c447 47.05%, #c0d3c447 47.12%, transparent 47.18%);
+  animation: var(--ambient-after);
+}
+
+/* 05 — warm daylight and its shadow move across the paper surface. */
+.theme-5 .background-art::before {
+  inset: -220px -300px -160px;
+  background:
+    linear-gradient(112deg, transparent 25%, #b39a633b 35%, #fffdf6d9 45%, #d0b37740 57%, transparent 67%);
+  animation: var(--ambient-before);
+}
+.theme-5 .background-art::after {
+  inset: -180px -240px -120px;
+  background:
+    linear-gradient(112deg, transparent 49%, #a6906252 49.05%, #a6906252 49.14%, transparent 49.2%);
+  animation: var(--ambient-after);
+}
+
+@keyframes champion-light {
+  from { transform: translate3d(-160px, -24px, 0); }
+  to { transform: translate3d(180px, 38px, 0); }
+}
+@keyframes champion-arch {
+  from { transform: translate3d(-80px, -18px, 0); }
+  to { transform: translate3d(80px, 24px, 0); }
+}
+@keyframes champion-grid {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(152px, 76px, 0); }
+}
+@keyframes champion-sweep {
+  from { transform: translate3d(-190px, -20px, 0); }
+  to { transform: translate3d(190px, 28px, 0); }
+}
+@keyframes champion-daylight {
+  from { transform: translate3d(-180px, -20px, 0); }
+  to { transform: translate3d(180px, 32px, 0); }
+}

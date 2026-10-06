@@ -1,6 +1,10 @@
 /* Five production views of Champion Tower 21. No sample-data fallback. */
 (() => {
   'use strict';
+  const assetBase=new URL('.',document.currentScript.src);
+  const rootBase=new URL('../',assetBase);
+  const monitorMode=document.body.dataset.mode==='monitor';
+  const monitorURL=v=>new URL('monitor/?view='+v+'&motion=on',rootBase).href;
   const variants = [
     {id:1, name:'라이트 바', en:'LIGHT & PACE', desc:'전일 증감을 빛의 길이로. 넓은 조명이 천천히 흐르는 무대.', speed:'전일 증감 · 막대 길이 = 증가·감소 인원', bg:'느리게 흐르는 보랏빛 조명', recommend:true},
     {id:2, name:'아크 게이지', en:'THE QUIET ARCH', desc:'전일 증감을 하나의 곡선으로. 아치의 빛이 은은하게 밝아지는 무대.', speed:'전일 증감 · 호의 길이 = 증가·감소 인원', bg:'빛이 번갈아 번지는 아치'},
@@ -15,21 +19,32 @@
   const pct = c => Number.isFinite(c.progress) ? `${fmt(c.progress)}%` : '—';
   const keys = {kr:'1club.kr',mfk:'myfirstkorea',jp:'1club.jp',rr:'rollsroycecarsseoul',plus:'pluskr_official',kef:'kef.korea',prov:'rollsroyceseoulprovenance',kakao:'rr_kakao',yt:'rr_youtube'};
   const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
-  let motion=true;
-  try{motion=localStorage.getItem('kpi-champion-ambient-v1')!=='off';}catch{}
+  let motionPreference=new URLSearchParams(location.search).get('motion');
+  if(!['on','off'].includes(motionPreference)){try{motionPreference=localStorage.getItem('kpi-champion-motion-v2');}catch{}}
+  if(!['on','off'].includes(motionPreference))motionPreference='auto';
   function syncMotion(){
-    const enabled=motion&&!reducedMotion.matches;
+    const enabled=motionPreference==='on'||(motionPreference==='auto'&&!reducedMotion.matches);
     document.body.classList.toggle('motion-paused',!enabled);
+    document.body.classList.toggle('force-motion',motionPreference==='on');
     $('#motion').setAttribute('aria-pressed',String(enabled));
-    $('#motion').textContent=reducedMotion.matches?'배경 정지 · 기기 설정':enabled?'배경 움직임 켜짐':'배경 움직임 꺼짐';
-    $('#motion').disabled=reducedMotion.matches;
+    $('#motion').textContent=enabled?'배경 움직임 켜짐':'배경 움직임 꺼짐';
+    $('#motion').disabled=false;
   }
-  $('#motion').addEventListener('click',()=>{motion=!motion;try{localStorage.setItem('kpi-champion-ambient-v1',motion?'on':'off');}catch{}syncMotion();});
+  $('#motion').addEventListener('click',()=>{motionPreference=document.body.classList.contains('motion-paused')?'on':'off';try{localStorage.setItem('kpi-champion-motion-v2',motionPreference);}catch{}if(monitorMode){const url=new URL(location.href);url.searchParams.set('motion',motionPreference);history.replaceState(null,'',url);}syncMotion();});
   reducedMotion.addEventListener('change',syncMotion);
   syncMotion();
   const flags = {kr:'🇰🇷',mfk:'🌏',jp:'🇯🇵',xhs:'🇨🇳'};
   let data = null, fetching = false, pendingRender = false;
-  const currentView = () => location.hash === '#compare' ? 'compare' : ([1,2,3,4,5].includes(Number(location.hash.slice(1)))?Number(location.hash.slice(1)):1);
+  const currentView = () => {
+    if(monitorMode){const v=Number(new URLSearchParams(location.search).get('view'));return [1,2,3,4,5].includes(v)?v:1;}
+    return location.hash === '#compare' ? 'compare' : ([1,2,3,4,5].includes(Number(location.hash.slice(1)))?Number(location.hash.slice(1)):1);
+  };
+  if(monitorMode){
+    document.body.classList.add('presenting','monitor-mode');
+    const controls=$('.app-actions');controls.classList.add('monitor-toolbar');
+    const compare=controls.querySelector('a');compare.href=new URL('#compare',rootBase).href;compare.textContent='5개 시안 비교';compare.target='_blank';compare.rel='noopener';
+    document.body.appendChild(controls);
+  }
   const trophy = '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 5h12v8a6 6 0 0 1-12 0V5Zm0 3H5v4a5 5 0 0 0 6 5m11-9h5v4a5 5 0 0 1-6 5M16 19v7m-6 1h12"/></svg>';
   function status(c) {
     if (!Number.isFinite(c.current)) return {cls:'unknown',label:'집계 확인'};
@@ -95,11 +110,12 @@
   }
   function render() {
     const view=currentView(), gallery=view==='compare',v=gallery?1:view;
-    $('#variants').innerHTML=`<a href="#compare" aria-current="${gallery?'page':'false'}">5개 시안 비교</a>`+variants.map(x=>`<a href="#${x.id}" aria-current="${view===x.id?'page':'false'}"><span>${String(x.id).padStart(2,'0')}</span>${x.name}${x.recommend?'<b>추천</b>':''}</a>`).join('');
+    document.title='1%CLUB · '+(gallery?'챔피언 타워 시안 5개':variants[v-1].name+(monitorMode?' · 모니터':''));
+    $('#variants').innerHTML=`<a href="#compare" aria-current="${gallery?'page':'false'}">5개 시안 비교</a>`+variants.map(x=>`<a href="${monitorURL(x.id)}" target="_blank" rel="noopener" aria-label="0${x.id} ${x.name} 모니터 새 탭"><span>${String(x.id).padStart(2,'0')}</span>${x.name}${x.recommend?'<b>추천</b>':''}</a>`).join('');
     $('#variant-title').textContent=gallery?'같은 성과, 다섯 가지 표현.':variants[v-1].name;
-    $('#variant-description').textContent=gallery?'모두 실제 데이터로 작동합니다. 시안을 열면 잔잔하게 움직이는 배경까지 확인할 수 있습니다.':variants[v-1].desc;
+    $('#variant-description').textContent=gallery?'시안을 누르면 새 탭에서 움직이는 모니터 화면이 바로 열립니다. 열린 주소를 저장해 그대로 사용하세요.':variants[v-1].desc;
     $('#gallery').hidden=!gallery;$('#board').hidden=gallery;
-    if(gallery) $('#gallery').innerHTML=variants.map(x=>`<a class="preview" href="#${x.id}"><div class="preview-image"><img src="${new URL("previews/"+x.id+".png",document.querySelector("script[src$=\"app.js\"]").src).href}" alt="${x.name} 챔피언 타워 전체 화면" loading="lazy"><span>시안 열기 ↗</span></div><div class="preview-copy"><span class="preview-index">0${x.id}</span><div><h2>${x.name}${x.recommend?'<b>추천</b>':''}</h2><p>${x.desc}</p><span class="preview-bg">배경 · ${x.bg}</span></div></div></a>`).join('');
+    if(gallery) $('#gallery').innerHTML=variants.map(x=>`<a class="preview" href="${monitorURL(x.id)}" target="_blank" rel="noopener"><div class="preview-image"><img src="${new URL('previews/'+x.id+'.png',assetBase).href}" alt="${x.name} 챔피언 타워 전체 화면" loading="lazy"><span>모니터 화면 새 탭 ↗</span></div><div class="preview-copy"><span class="preview-index">0${x.id}</span><div><h2>${x.name}${x.recommend?'<b>추천</b>':''}</h2><p>${x.desc}</p><span class="preview-bg">배경 · ${x.bg}</span></div></div></a>`).join('');
     else renderBoard(v);
   }
   function showNotice(message) {$('#notice').hidden=!message;$('#notice').textContent=message;}
@@ -111,6 +127,7 @@
       data=incoming;window.championData=data;
       const source=String(data.sourceUpdatedAt||data.fetchedAt||'').replace('T',' ').slice(0,16);
       $('#data-status').innerHTML=`<i></i> 실제 데이터 연결 <span>피드 갱신 ${esc(source)} · 화면 5분마다 갱신</span>`;
+      const monitorStatus=$('#monitor-status');if(monitorStatus)monitorStatus.textContent='피드 '+source+' · 5분마다 갱신';
       showNotice((data.warnings||[]).join(' · '));
       // Avoid interrupting typing during the automatic refresh.
       if(!document.activeElement?.matches('[data-reason]')){pendingRender=false;render();}else pendingRender=true;
@@ -122,16 +139,16 @@
   }
   function fitFullscreen() {
     const board=$('#board'),main=$('main');
-    if(document.body.classList.contains('presenting')&&innerWidth>640){const h=board.offsetHeight,scale=Math.min(innerWidth/1600,innerHeight/h);board.style.transform='scale('+scale+')';main.style.width=1600*scale+'px';main.style.height=h*scale+'px';}
+    if(document.body.classList.contains('presenting')&&innerWidth>640&&board.offsetHeight){const h=board.offsetHeight,scale=Math.min(innerWidth/1600,innerHeight/h);board.style.transform='scale('+scale+')';main.style.width=1600*scale+'px';main.style.height=h*scale+'px';}
     else{board.style.transform='';main.style.width='';main.style.height='';}
   }
   window.addEventListener('resize',fitFullscreen);
-  async function exitFullscreen() {document.body.classList.remove('presenting');$('#exit-fullscreen').hidden=true;if(document.fullscreenElement)await document.exitFullscreen();fitFullscreen();}
+  async function exitFullscreen() {if(!monitorMode)document.body.classList.remove('presenting');$('#exit-fullscreen').hidden=true;if(document.fullscreenElement)await document.exitFullscreen();fitFullscreen();}
   $('#refresh').addEventListener('click',refresh);
   $('#fullscreen').addEventListener('click',async()=>{if(currentView()==='compare')location.hash='1';document.body.classList.add('presenting');$('#exit-fullscreen').hidden=false;try{await document.documentElement.requestFullscreen();}catch{}requestAnimationFrame(fitFullscreen);});
   $('#exit-fullscreen').addEventListener('click',exitFullscreen);
-  document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement){document.body.classList.remove('presenting');$('#exit-fullscreen').hidden=true;}requestAnimationFrame(fitFullscreen);});
-  document.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select'))return;if(e.key==='Escape')exitFullscreen();if(document.body.classList.contains('presenting')&&['ArrowLeft','ArrowRight'].includes(e.key)){const v=Number(currentView())||1;location.hash=String((v-1+(e.key==='ArrowRight'?1:4))%5+1);}});
+  document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement){if(!monitorMode)document.body.classList.remove('presenting');$('#exit-fullscreen').hidden=true;}requestAnimationFrame(fitFullscreen);});
+  document.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select'))return;if(e.key==='Escape')exitFullscreen();if(document.body.classList.contains('presenting')&&['ArrowLeft','ArrowRight'].includes(e.key)){const v=Number(currentView())||1,next=String((v-1+(e.key==='ArrowRight'?1:4))%5+1);if(monitorMode){const url=new URL(location.href);url.searchParams.set('view',next);history.replaceState(null,'',url);render();}else location.hash=next;}});
   document.addEventListener('input',e=>{if(e.target.matches('[data-reason]')){try{localStorage.setItem('kpi-follow-reason-v1:'+e.target.dataset.reason,e.target.value);}catch{showNotice('이 브라우저에서 팔로우 이유를 저장할 수 없습니다.');}}});
   document.addEventListener('focusout',e=>{if(pendingRender&&e.target.matches('[data-reason]'))setTimeout(()=>{if(!document.activeElement?.matches('[data-reason]')){pendingRender=false;render();}},0);});
   window.addEventListener('hashchange',render);
