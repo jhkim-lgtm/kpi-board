@@ -60,7 +60,7 @@ function render(view){
   view=Object.hasOwn(META,view)?String(view):['overview','more','monitor','stage'].includes(view)?view:'stage';
   const group=Number(view)>=21||view==='stage'?'stage':Number(view)>=11||view==='monitor'?'monitor':Number(view)>5||view==='more'?'more':'overview';
   const isMonitor=group==='monitor'||group==='stage',isGallery=['overview','more','monitor','stage'].includes(view);
-  const source=SNAPSHOTS[group==='stage'?3:group==='monitor'?2:group==='more'?1:0];
+  const source=structuredClone(SNAPSHOTS[group==='stage'?3:group==='monitor'?2:group==='more'?1:0]);
   DATA=isMonitor?window.Monitor.prepare(source):source;
   if(group==='stage'){const flags={kr:'🇰🇷',jp:'🇯🇵',xhs:'🇨🇳',mfk:'🌏'};DATA.rows.forEach(c=>{if(flags[c.id])c.name=flags[c.id]+' '+c.name;});}
   ctx=context(DATA);ctx.M=window.Monitor.make(ctx);
@@ -94,6 +94,21 @@ document.addEventListener('click',e=>{
   if(preview){select(preview.dataset.concept);window.scrollTo({top:0,behavior:'instant'});}
 });
 window.addEventListener('hashchange',()=>{if(SNAPSHOTS)render(location.hash.slice(1));});
-Promise.all(['data.json','data-20260930.json','data-monitor-20260930.json','data-stage-20260930.json'].map(path=>fetch(path).then(r=>{if(!r.ok)throw Error(r.status);return r.json();}))).then(data=>{
-  SNAPSHOTS=data;render(location.hash.slice(1));window.conceptsReady=true;
-}).catch(()=>{document.getElementById('gallery').textContent='시안 데이터를 불러오지 못했습니다. 새로고침해주세요.';});
+let liveRefreshInFlight=false;
+async function refreshLiveFollowers(){
+  if(liveRefreshInFlight)return;
+  liveRefreshInFlight=true;
+  const status=document.getElementById('live-data-status');
+  try{
+    const data=await window.ChampionData.load();
+    // All thirty existing views keep their layout and share the official feed.
+    SNAPSHOTS=[data,data,data,data];
+    render(location.hash.slice(1));window.conceptsReady=true;
+    status.textContent='기준 '+data.dataDate+' · 피드 '+(data.sourceUpdatedAt||data.fetchedAt).slice(0,16).replace('T',' ')+' · 5분 자동 갱신'+(data.warnings.length?' · '+data.warnings.join(' / '):'');
+  }catch(error){
+    status.textContent='공식 팔로워 연결 실패 · '+(SNAPSHOTS?'마지막 확인값 유지':'새로고침 후 다시 확인해주세요.');
+  }finally{liveRefreshInFlight=false;}
+}
+refreshLiveFollowers();
+setInterval(refreshLiveFollowers,5*60*1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshLiveFollowers();});
