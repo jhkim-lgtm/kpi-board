@@ -16,8 +16,9 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const fmt = n => Number.isFinite(n) ? new Intl.NumberFormat('ko-KR',{maximumFractionDigits:1}).format(n) : '—';
   const signed = n => Number.isFinite(n) ? (n>0?'+':n<0?'−':'') + fmt(Math.abs(n)) : '—';
+  const hasGoal = c => Number.isFinite(c.goal) && c.goal > (c.baseline || 0);
   const pct = c => Number.isFinite(c.progress) ? `${fmt(c.progress)}%` : '—';
-  const keys = {kr:'1club.kr',mfk:'myfirstkorea',jp:'1club.jp',rr:'rollsroycecarsseoul',plus:'pluskr_official',kef:'kef.korea',prov:'rollsroyceseoulprovenance',kakao:'rr_kakao',yt:'rr_youtube'};
+  const keys = {kr:'1club.kr',mfk:'myfirstkorea',jp:'1club.jp',rr:'rollsroycecarsseoul',plus:'pluskr_official',kef:'kef.korea',prov:'rollsroyceseoulprovenance',kakao:'rr_kakao',yt:'rr_youtube',theweekand:'theweekand_resort'};
   const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
   let motionPreference=new URLSearchParams(location.search).get('motion');
   if(!['on','off'].includes(motionPreference)){try{motionPreference=localStorage.getItem('kpi-champion-motion-v2');}catch{}}
@@ -50,7 +51,7 @@
     if (!Number.isFinite(c.current)) return {cls:'unknown',label:'집계 확인'};
     if (c.stale) return {cls:'unknown',label:'이전 집계'};
     if (c.delta < 0) return {cls:'down',label:'감소 확인'};
-    if (c.current >= c.goal) return {cls:'achieved',label:'목표 달성'};
+    if (hasGoal(c) && c.current >= c.goal) return {cls:'achieved',label:'목표 달성'};
     if (c.delta > 0) return {cls:'up',label:'성장 중'};
     return {cls:'neutral',label:c.delta===0?'변동 없음':'비교 대기'};
   }
@@ -59,6 +60,7 @@
     return `<div class="reasons">${fields.map(([key,name])=>`<input data-reason="${esc(key)}" aria-label="${esc(name)} 팔로우 이유" placeholder="${c.id==='xhs'?esc(name)+' · ':''}팔로우 이유 입력" maxlength="100">`).join('')}</div>`;
   }
   function tower(c) {
+    if(!hasGoal(c))return '<div class="goal-pending"><span>목표</span><strong>미설정</strong></div>';
     const level = Math.max(0,Math.min(100,c.progress||0));
     const next=c.growth.nextPercent;
     return `<div class="tower-wrap"><div class="tower" role="meter" aria-label="${esc(c.name)} 목표 진척" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${level}" aria-valuetext="${pct(c)}" style="--level:${level}%"><div class="tower-grid">${Array.from({length:11},(_,i)=>`<i style="bottom:${i*10}%">${i%5===0?`<span>${i*10}</span>`:''}</i>`).join('')}</div>${next?`<div class="tower-next" style="bottom:${next}%"><span>다음 ${next}%</span></div>`:''}<div class="tower-fill"><i class="rise-beam" aria-hidden="true"></i><i class="rise-beam second" aria-hidden="true"></i></div><div class="tower-marker"><b></b></div></div><div class="tower-caption"><span>목표 진척</span><strong>${pct(c)}</strong></div></div>`;
@@ -92,10 +94,14 @@
     if(variant===5) visual=`<div class="dots">${Array.from({length:24},(_,i)=>`<i class="${i<Math.ceil(ratio*24)?'lit':''}" style="--step:${i}"></i>`).join('')}</div>`;
     return `<div class="speed speed-${variant} ${c.delta<0?'negative':''}" aria-label="전일 ${signed(c.delta)}명, 공통 최대 눈금 ${fmt(max)}명">${visual}<span class="speed-note">전일 ${c.delta===0?'변동 없음':c.delta<0?'감소 규모':'증가 규모'}</span></div>`;
   }
+  function goalSummary(c) {
+    if(!hasGoal(c))return '<div class="goal"><span>목표 미설정</span><span>현재 수치만 표시</span></div>';
+    return `<div class="goal"><span>목표 ${fmt(c.goal)}</span><span>${Number.isFinite(c.current)&&c.current>=c.goal?'달성 완료':`남은 ${fmt(Number.isFinite(c.current)?Math.max(0,c.goal-c.current):null)}명`}</span></div>`;
+  }
   function card(c,variant,max,rank=0) {
     const s=status(c), hero=rank>0;
     const partHTML=(c.parts||[]).length?`<div class="parts">${c.parts.map(p=>`<span>${esc(p.name)} <b>${fmt(p.current ?? p.value)}</b></span>`).join('')}</div>`:'';
-    return `<article class="channel ${hero?'hero':'compact'} rank-${rank} ${s.cls} momentum-${c.growth.mode}" data-channel="${c.id}" style="--growth-duration:${c.growth.duration||6}s"><div class="card-heading">${hero?`<span class="medal">${rank===1?trophy:`<b>${String(rank).padStart(2,'0')}</b>`}</span>`:''}<div class="channel-heading">${hero?`<span class="rank-label">${c.jointRank?'공동 ':''}전일 증가 ${c.growthRank||rank}위</span>`:''}<h3>${flags[c.id]?`<span class="flag">${flags[c.id]}</span>`:''}${esc(c.name.replace(/^[🇰🇷🇯🇵🇨🇳🌏]+\s*/u,''))}</h3><span class="sub">${esc(c.sub||'')}</span></div><span class="badge">${s.label}${!hero&&c.jointRank&&c.growthRank<=3?' · 공동 '+c.growthRank+'위':''}</span></div><div class="card-main"><div class="metrics"><strong class="current">${fmt(c.current)}</strong><div class="change ${c.delta<0?'negative':''}"><b>${signed(c.delta)}</b><span>${esc(c.period)}</span>${hero&&c.growth.mode==='growth'&&c.growth.streak>1?`<small class="streak">${c.growth.streak}일 연속 증가</small>`:''}</div>${speed(c,variant,max)}${partHTML}</div>${hero?tower(c):''}</div>${!hero?`<div class="compact-progress"><div class="goal-rail" role="meter" aria-label="${esc(c.name)} 목표 진척" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.max(0,Math.min(100,c.progress||0))}"><i style="width:${Math.max(0,Math.min(100,c.progress||0))}%"></i></div><span>현재 <b>${pct(c)}</b></span></div>`:''}<div class="goal"><span>목표 ${fmt(c.goal)}</span><span>${c.current>=c.goal?'달성 완료':`남은 ${fmt(Number.isFinite(c.current)?Math.max(0,c.goal-c.current):null)}명`}</span></div>${milestone(c,hero)}${reasons(c)}<span class="row-date">${esc(c.dataDate||'집계일 확인 중')}${c.stale?' · 최신 집계 확인 필요':''}</span></article>`;
+    return `<article class="channel ${hero?'hero':'compact'} rank-${rank} ${s.cls} momentum-${c.growth.mode}" data-channel="${c.id}" style="--growth-duration:${c.growth.duration||6}s"><div class="card-heading">${hero?`<span class="medal">${rank===1?trophy:`<b>${String(rank).padStart(2,'0')}</b>`}</span>`:''}<div class="channel-heading">${hero?`<span class="rank-label">${c.jointRank?'공동 ':''}전일 증가 ${c.growthRank||rank}위</span>`:''}<h3>${flags[c.id]?`<span class="flag">${flags[c.id]}</span>`:''}${esc(c.name.replace(/^[🇰🇷🇯🇵🇨🇳🌏]+\s*/u,''))}</h3><span class="sub">${esc(c.sub||'')}</span></div><span class="badge">${s.label}${!hero&&c.jointRank&&c.growthRank<=3?' · 공동 '+c.growthRank+'위':''}</span></div><div class="card-main"><div class="metrics"><strong class="current">${fmt(c.current)}</strong><div class="change ${c.delta<0?'negative':''}"><b>${signed(c.delta)}</b><span>${esc(c.period)}</span>${hero&&c.growth.mode==='growth'&&c.growth.streak>1?`<small class="streak">${c.growth.streak}일 연속 증가</small>`:''}</div>${speed(c,variant,max)}${partHTML}</div>${hero?tower(c):''}</div>${!hero&&hasGoal(c)?`<div class="compact-progress"><div class="goal-rail" role="meter" aria-label="${esc(c.name)} 목표 진척" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.max(0,Math.min(100,c.progress||0))}"><i style="width:${Math.max(0,Math.min(100,c.progress||0))}%"></i></div><span>현재 <b>${pct(c)}</b></span></div>`:''}${goalSummary(c)}${milestone(c,hero)}${reasons(c)}<span class="row-date">${esc(c.dataDate||'집계일 확인 중')}${c.stale?' · 최신 집계 확인 필요':''}</span></article>`;
   }
   function renderBoard(v) {
     if(!data) return;

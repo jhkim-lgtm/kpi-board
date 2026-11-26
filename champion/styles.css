@@ -50,3 +50,6 @@ body.force-motion .background-art::after{animation:var(--ambient-after,none)!imp
 body.force-motion .background-art>i{animation:var(--ambient-arch,none)!important}
 body.motion-paused .background-art::before,body.motion-paused .background-art::after,body.motion-paused .background-art>i,body.force-motion.motion-paused .background-art::before,body.force-motion.motion-paused .background-art::after,body.force-motion.motion-paused .background-art>i{animation-play-state:paused!important}
 @media(max-width:640px){.monitor-toolbar{width:auto;left:10px;right:10px;bottom:8px;justify-content:center;opacity:.8}.monitor-toolbar>a{margin-right:0}.monitor-mode{padding-bottom:58px}.monitor-status{bottom:52px}.monitor-mode .board{min-height:100vh}.monitor-mode .board-inner{padding-top:23px}}
+
+/* A target is optional for managed accounts. Never draw an invented goal. */
+.goal-pending{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;border:1px dashed var(--line);border-radius:5px;color:var(--muted);min-height:50px}.goal-pending>span{font-size:9px}.goal-pending>strong{font-size:14px;font-weight:500}

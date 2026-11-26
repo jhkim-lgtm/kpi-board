@@ -61,10 +61,10 @@
 .design-20 .gd20-empty{font-size:16px;fill:#809080}
 .design-20 .gd20-legend{display:flex;flex-direction:column;min-height:0;min-width:0;padding-top:1px}
 .design-20 .gd20-legend-title{display:flex;justify-content:space-between;font-size:10px;color:#8da990;line-height:1.4;padding:0 0 8px;border-bottom:1px solid #b6c4a735}
-.design-20 .gd20-legend-row{display:grid;grid-template-columns:24px minmax(0,1fr) 66px;gap:9px;align-items:center;flex:1;min-height:0;border-bottom:1px solid #a4bda11c;padding:3px 0}
+.design-20 .gd20-legend-row{display:grid;grid-template-columns:24px minmax(0,1fr) 66px;gap:9px;align-items:center;flex:1;min-height:0;border-bottom:1px solid #a4bda11c;padding:2px 0}
 .design-20 .gd20-legend-row:last-child{border-bottom:0}
 .design-20 .gd20-legend-code{font-size:11px;color:#9eb18e;letter-spacing:.5px;font-weight:600}
-.design-20 .gd20-channel{min-width:0;display:flex;flex-direction:column;gap:3px}
+.design-20 .gd20-channel{min-width:0;display:flex;flex-direction:column;gap:2px}
 .design-20 .gd20-channel h3{font-size:13px;font-weight:500;line-height:1.15;color:#d4dfbf;letter-spacing:-.2px;white-space:nowrap}
 .design-20 .gd20-channel>span{font-size:17px;font-weight:550;line-height:1;color:#e5edcf;font-variant-numeric:tabular-nums;white-space:nowrap}
 .design-20 .gd20-channel small{font-size:9px;font-weight:400;margin-left:3px;color:#799b80}

@@ -13,7 +13,8 @@
     {id:'kef', key:'kef.korea', name:'KEF', sub:'Instagram', group:'agency', goal:15000},
     {id:'prov', key:'rollsroyceseoulprovenance', name:'롤스로이스 프로비넌스', sub:'Instagram', group:'agency', goal:5000},
     {id:'kakao', key:'rr_kakao', name:'롤스로이스 카카오', sub:'Kakao', group:'agency', goal:2000, monthly:true},
-    {id:'yt', key:'rr_youtube', name:'롤스로이스 유튜브', sub:'YouTube', group:'agency', goal:2000, monthly:true}
+    {id:'yt', key:'rr_youtube', name:'롤스로이스 유튜브', sub:'YouTube', group:'agency', goal:2000, monthly:true},
+    {id:'theweekand', key:'theweekand_resort', name:'더위크앤 리조트', sub:'Instagram', group:'agency', goal:null}
   ];
   const number = value => {
     const clean = String(value == null ? '' : value).trim().replace(/,/g, '');
@@ -97,9 +98,9 @@
         if(!month)warnings.push(config.name+' 월간 기준일 확인 중');
         result={current,delta:current!=null&&comparable?number(source.monthly_delta):null,period:month?Number(month.slice(5))+'월 전월 대비':'월간 · 기준월 확인 중',dataDate:month,updatedAt:timestamp(source.ts),dailyAvg7:null,history:[],declineDays:0,parts:[]};
       }else result=daily(config.key,config.name);
-      const baseline=config.baseline||0;
+      const baseline=config.baseline||0,hasGoal=Number.isFinite(config.goal)&&config.goal>baseline;
       return {...config,...result,name:config.name,baseline,baselineDate:config.baseline?'2026-02':null,
-        asOf:result.dataDate,progress:result.current==null?null:Math.max(0,Math.min(100,(result.current-baseline)/(config.goal-baseline)*100))};
+        asOf:result.dataDate,progress:result.current==null||!hasGoal?null:Math.max(0,Math.min(100,(result.current-baseline)/(config.goal-baseline)*100))};
     });
     const updated=rows.map(row=>row.updatedAt).filter(Boolean).sort(),sourceUpdatedAt=updated[updated.length-1]||null;
     if(!sourceUpdatedAt||Date.parse(fetchedAt)-Date.parse(sourceUpdatedAt)>45*60000)warnings.push('피드 동기화가 지연되었습니다. 마지막 수집값을 표시합니다.');
