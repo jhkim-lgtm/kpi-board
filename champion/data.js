@@ -14,7 +14,7 @@
     {id:'prov', key:'rollsroyceseoulprovenance', name:'롤스로이스 프로비넌스', sub:'Instagram', group:'agency', goal:5000},
     {id:'kakao', key:'rr_kakao', name:'롤스로이스 카카오', sub:'Kakao', group:'agency', goal:2000, monthly:true},
     {id:'yt', key:'rr_youtube', name:'롤스로이스 유튜브', sub:'YouTube', group:'agency', goal:2000, monthly:true},
-    {id:'theweekand', key:'theweekand_resort', name:'더위크앤 리조트', sub:'Instagram', group:'agency', goal:null}
+    {id:'theweekand', key:'theweekand_resort', name:'더위크앤 리조트', sub:'Instagram', group:'agency', goal:20000}
   ];
   const number = value => {
     const clean = String(value == null ? '' : value).trim().replace(/,/g, '');
