@@ -110,7 +110,7 @@
 .concept-19 .c-sunset i{position:absolute;inset:17px;border:1px solid #7d276d40;border-radius:50%}
 .concept-19 .c-sunset i:nth-child(2){inset:36px}.concept-19 .c-sunset i:nth-child(3){inset:55px;background:#ffe0a15c}
 .concept-19 .c-sunset svg{position:absolute;width:42px;height:42px;color:#8c426a;top:0;left:80px;animation:c-star-breathe 4s ease-in-out infinite}
-.concept-19 .c-agency-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:1fr 1fr;gap:12px;flex:1;min-height:0}
+.concept-19 .c-agency-tiles{display:grid;grid-template-columns:repeat(var(--agency-half-count,3),minmax(0,1fr));grid-template-rows:1fr 1fr;gap:12px;flex:1;min-height:0}
 .concept-19 .c-metric{border:0;border-radius:17px;padding:14px 16px;box-shadow:inset 0 1px 0 #ffffff25}
 .concept-19 .c-metric-head{flex-wrap:wrap;gap:5px}
 .concept-19 .c-metric h3{font-size:13px}

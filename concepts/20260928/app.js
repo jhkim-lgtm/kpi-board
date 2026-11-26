@@ -1,6 +1,6 @@
 const META={
   1:{name:'핵심 카드',desc:'현재 규모와 증감을 가장 익숙하고 간결하게.',title:'채널 성장 현황',recommend:true},
-  2:{name:'한눈에 비교',desc:'열 개 채널을 같은 기준으로 빠르게 비교.',title:'숫자로 보는 채널'},
+  2:{name:'한눈에 비교',desc:'전체 채널을 같은 기준으로 빠르게 비교.',title:'숫자로 보는 채널'},
   3:{name:'목표 트랙',desc:'목표까지 얼마나 왔는지, 얼마나 남았는지.',title:'목표까지의 거리'},
   4:{name:'증감 보드',desc:'어디에서 늘고, 어디에서 줄었는지 먼저.',title:'오늘의 변화'},
   5:{name:'TV 전광판',desc:'멀리서도 읽히는 큰 숫자와 최소한의 정보.',title:'채널 현황.'},
@@ -18,10 +18,10 @@ const META={
   17:{name:'미션 컨트롤',desc:'비상·감소 채널을 먼저 발견하는 관제 화면.',title:'지금, 확인할 신호',recommend:true},
   18:{name:'챔피언 포디움',desc:'오늘의 성장 상위 채널을 시상대와 색종이로 축하.',title:'오늘의 성장 챔피언'},
   19:{name:'선셋 모자이크',desc:'핑크·오렌지 그라데이션과 다채로운 성장 모자이크.',title:'함께 만드는 성장의 색'},
-  20:{name:'프리즘 타워',desc:'빛이 오르는 열 개의 타워. 현재 높이는 고정.',title:'더 높은 곳을 향해'},
+  20:{name:'프리즘 타워',desc:'빛이 오르는 채널별 타워. 현재 높이는 고정.',title:'더 높은 곳을 향해'},
   21:{name:'챔피언 타워',desc:'성장 상위 세 채널의 시상대 안에 목표 타워.',title:'성장을 쌓고, 성과를 축하하다',recommend:true},
-  22:{name:'골든 리그',desc:'목표 진척순으로 세운 열 개의 황금빛 타워.',title:'목표에 가까운 순서대로'},
-  23:{name:'오로라 포디움',desc:'큰 챔피언 무대와 일곱 개의 성장 타워.',title:'오늘의 챔피언, 내일의 목표'},
+  22:{name:'골든 리그',desc:'목표 진척순으로 세운 채널별 황금빛 타워.',title:'목표에 가까운 순서대로'},
+  23:{name:'오로라 포디움',desc:'큰 챔피언 무대와 채널별 성장 타워.',title:'오늘의 챔피언, 내일의 목표'},
   24:{name:'프리즘 아레나',desc:'타워가 펼쳐진 경기장과 성장 상위 메달.',title:'성장의 아레나'},
   25:{name:'국가별 스테이지',desc:'국기와 함께 크게 보는 자사 매체의 성장.',title:'나라별 채널, 빛나는 목표'},
   26:{name:'듀얼 챔피언',desc:'왼쪽에는 성장 시상대, 오른쪽에는 목표 타워.',title:'오늘의 성과와 다음 목표'},
@@ -30,13 +30,18 @@ const META={
   29:{name:'그로스 시상식',desc:'스포트라이트를 받는 챔피언과 타워 관람석.',title:'오늘의 성장을 시상합니다'},
   30:{name:'월드 챔피언십',desc:'국기 타워와 운영대행 테라스를 한 무대에.',title:'함께 성장하는 월드 스테이지'}
 };
-const fmt=n=>Number(n).toLocaleString('ko-KR');
+const fmt=n=>Number.isFinite(n)?n.toLocaleString('ko-KR'):'—';
+const hasGoal=c=>Number.isFinite(c.goal)&&c.goal>(c.baseline||0);
+const hasProgress=c=>hasGoal(c)&&Number.isFinite(c.progress);
+const goalValue=c=>hasGoal(c)?fmt(c.goal):'미설정';
+const goalMissing=(c,classes='',showCurrent=false)=>`<div class="${classes} goal-missing">${showCurrent?`<strong class="num">${fmt(c.current)}</strong>`:''}<span>${hasGoal(c)?'진척 미집계':'목표 미설정'}</span></div>`;
+const kstStamp=value=>Number.isFinite(Date.parse(value))?new Date(Date.parse(value)+9*3600000).toISOString().slice(0,16).replace('T',' '):'조회 시각 확인 중';
 const signed=n=>n==null?'—':(n>0?'+':n<0?'−':'')+fmt(Math.abs(n));
-const pct=c=>c.progress.toFixed(1)+'%';
-const change=c=>`<span class="delta ${c.delta>0?'up':c.delta<0?'down':'flat'}">${signed(c.delta)}<small>${c.period}</small></span>`;
-const meter=c=>`<div class="meter" style="--pct:${c.progress}%" role="meter" aria-label="${c.name} 목표 달성률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${c.progress.toFixed(1)}"><i class="meter-fill"></i><b class="meter-dot"></b></div>`;
+const pct=c=>hasProgress(c)?c.progress.toFixed(1)+'%':'—';
+const change=c=>`<span class="delta ${c.delta>0?'up':c.delta<0?'down':'flat'}">${signed(c.delta)}<small>${c.stale?'이전 집계':c.period}</small></span>`;
+const meter=c=>!hasProgress(c)?goalMissing(c):`<div class="meter" style="--pct:${c.progress}%" role="meter" aria-label="${c.name} 목표 달성률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${c.progress.toFixed(1)}"><i class="meter-fill"></i><b class="meter-dot"></b></div>`;
 const parts=c=>c.parts.length?`<div class="parts">${c.parts.map(p=>`<span>${p.name}<b>${fmt(p.current)}</b></span>`).join('')}</div>`:'';
-const goal=c=>`<div class="goal-line"><b>${pct(c)}</b><span>목표 ${fmt(c.goal)}</span></div>`;
+const goal=c=>`<div class="goal-line"><b>${pct(c)}</b><span>목표 ${goalValue(c)}</span></div>`;
 const heading=(title,sub)=>`<div class="section-head"><h3>${title}</h3><span>${sub}</span></div>`;
 function core(ctx){
   return heading('자사 매체','팔로워 · 전일 증감')+`<div class="core-own">${ctx.own.map(c=>`<article class="core-card"><div class="channel-name">${c.name}</div><div class="platform">${c.sub}</div><div class="core-current num">${fmt(c.current)}</div>${change(c)}${parts(c)}${meter(c)}${goal(c)}</article>`).join('')}</div>`
@@ -54,7 +59,7 @@ let DATA,ctx,SNAPSHOTS;
 const number=n=>String(n).padStart(2,'0');
 function context(data){
   const own=data.rows.filter(r=>r.group==='own'),agency=data.rows.filter(r=>r.group==='agency');
-  return {own,agency,all:data.rows,total:own.reduce((s,r)=>s+r.current,0),totalDelta:own.every(r=>r.delta!=null)?own.reduce((s,r)=>s+r.delta,0):null,fmt,signed,change,meter,pct,parts,dateLabel:data.fetchedAt.slice(0,16).replace('T',' ')};
+  return {own,agency,all:data.rows,total:own.every(r=>r.dataDate===data.dataDate&&Number.isFinite(r.current))?own.reduce((s,r)=>s+r.current,0):null,totalDelta:own.every(r=>!r.stale&&r.dataDate===data.dataDate&&Number.isFinite(r.delta))?own.reduce((s,r)=>s+r.delta,0):null,fmt,signed,change,meter,pct,parts,hasGoal,hasProgress,goalValue,goalMissing,dateLabel:kstStamp(data.fetchedAt)};
 }
 function render(view){
   view=Object.hasOwn(META,view)?String(view):['overview','more','monitor','stage'].includes(view)?view:'stage';
@@ -62,6 +67,8 @@ function render(view){
   const isMonitor=group==='monitor'||group==='stage',isGallery=['overview','more','monitor','stage'].includes(view);
   const source=structuredClone(SNAPSHOTS[group==='stage'?3:group==='monitor'?2:group==='more'?1:0]);
   DATA=isMonitor?window.Monitor.prepare(source):source;
+  const today=new Date(Date.now()+9*3600000).toISOString().slice(0,10);
+  DATA.rows.forEach(c=>{c.stale=c.period==='전일'&&(c.dataDate!==DATA.dataDate||c.dataDate<today);if(c.stale)c.delta=null;});
   if(group==='stage'){const flags={kr:'🇰🇷',jp:'🇯🇵',xhs:'🇨🇳',mfk:'🌏'};DATA.rows.forEach(c=>{if(flags[c.id])c.name=flags[c.id]+' '+c.name;});}
   ctx=context(DATA);ctx.M=window.Monitor.make(ctx);
   const entries=Object.entries(META).filter(([n])=>group==='stage'?Number(n)>=21:group==='monitor'?Number(n)>=11&&Number(n)<=20:group==='more'?Number(n)>5&&Number(n)<=10:Number(n)<=5);
@@ -83,7 +90,7 @@ function render(view){
   const board=document.getElementById('board');board.className='board concept-'+view+(isMonitor?' monitor-board':'');
   const month=ctx.all.find(r=>r.id==='kakao').period;
   const tag=isMonitor?(window.Monitor.state.demo?'<span class="m-demo-label">효과 데모 · 가상 데이터</span>':'<span class="m-snapshot-label">모니터 디자인 시안</span>'):'';
-  board.innerHTML=`<div class="board-inner"><header class="board-head"><div><div class="brand">1%CLUB ${tag}</div><h2>${m.title}</h2><div class="asof">${DATA.dataDate.replaceAll('-','.')} 기준${isMonitor?' · '+ctx.dateLabel.slice(11)+' 조회':''}</div></div><div class="overview"><span>자사 매체 팔로워 합계</span><strong class="num">${fmt(ctx.total)}</strong>${change({delta:ctx.totalDelta,period:'전일'})}</div></header>${isMonitor?window.Monitor.legend(ctx):''}<div class="content">${renderers[view](ctx)}</div><footer class="board-foot"><span>롤스로이스 서울 0% = 운영 시작월 말(2026.02) 22,012명 · 카카오·유튜브 증감 = ${month}</span><span>${isMonitor&&window.Monitor.state.demo?'가상 데이터 · 효과 확인용':'데이터 조회 '+ctx.dateLabel} · 시안 ${number(view)}</span></footer></div>`;
+  board.innerHTML=`<div class="board-inner" style="--all-count:${ctx.all.length};--own-count:${ctx.own.length};--agency-count:${ctx.agency.length};--all-half-count:${Math.ceil(ctx.all.length/2)};--agency-half-count:${Math.ceil(ctx.agency.length/2)};--radar-bottom-count:${Math.max(1,ctx.all.length-7)};--own-share:${ctx.own.length}fr;--agency-share:${ctx.agency.length}fr"><header class="board-head"><div><div class="brand">1%CLUB ${tag}</div><h2>${m.title}</h2><div class="asof">${DATA.dataDate.replaceAll('-','.')} 기준${isMonitor?' · '+ctx.dateLabel.slice(11)+' 조회':''}</div></div><div class="overview"><span>자사 매체 팔로워 합계</span><strong class="num">${fmt(ctx.total)}</strong>${change({delta:ctx.totalDelta,period:'전일'})}</div></header>${isMonitor?window.Monitor.legend(ctx):''}<div class="content">${renderers[view](ctx)}</div><footer class="board-foot"><span>롤스로이스 서울 0% = 운영 시작월 말(2026.02) 22,012명 · 카카오·유튜브 증감 = ${month}</span><span>${isMonitor&&window.Monitor.state.demo?'가상 데이터 · 효과 확인용':'데이터 조회 '+ctx.dateLabel} · 시안 ${number(view)}</span></footer></div>`;
   if(isMonitor)window.Monitor.hydrate();
 }
 window.renderConcept=render;
@@ -104,7 +111,7 @@ async function refreshLiveFollowers(){
     // All thirty existing views keep their layout and share the official feed.
     SNAPSHOTS=[data,data,data,data];
     render(location.hash.slice(1));window.conceptsReady=true;
-    status.textContent='기준 '+data.dataDate+' · 피드 '+(data.sourceUpdatedAt||data.fetchedAt).slice(0,16).replace('T',' ')+' · 5분 자동 갱신'+(data.warnings.length?' · '+data.warnings.join(' / '):'');
+    status.textContent='기준 '+data.dataDate+' · 피드 '+kstStamp(data.sourceUpdatedAt||data.fetchedAt)+' · 5분 자동 갱신'+(data.warnings.length?' · '+data.warnings.join(' / '):'');
   }catch(error){
     status.textContent='공식 팔로워 연결 실패 · '+(SNAPSHOTS?'마지막 확인값 유지':'새로고침 후 다시 확인해주세요.');
   }finally{liveRefreshInFlight=false;}

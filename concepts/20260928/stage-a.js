@@ -3,10 +3,11 @@
   const state=(c,ctx)=>`m-${ctx.M.status(c).key.replace(/^m-/,'')}`;
   const level=c=>Math.max(0,Math.min(100,Number(c.progress)||0));
   function tower(c,ctx,phase=0) {
+    if(!ctx.hasProgress(c))return ctx.goalMissing(c,'sa-tower');
     return `<div class="sa-tower" style="--sa-level:${level(c)}%;--sa-phase:${-phase*1.1}s" role="meter" aria-label="${c.name} 현재 목표 진척" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${level(c).toFixed(1)}"><div class="sa-grid" aria-hidden="true">${Array.from({length:11},(_,i)=>`<i style="bottom:${i*10}%">${i===0||i===5||i===10?`<span>${i*10}%</span>`:''}</i>`).join('')}</div><div class="sa-fill"><i></i></div><div class="sa-rise-window" aria-hidden="true"><div class="sa-rise">${ctx.M.icon(c.id==='rr'?'car':'rocket')}</div></div><div class="sa-fixed"><i></i><b>${ctx.pct(c)}</b></div></div>`;
   }
   const parts=(c,ctx)=>`<div class="sa-parts">${ctx.parts(c)}</div>`;
-  const goal=(c,ctx)=>`<div class="sa-goal"><span>목표</span><b>${ctx.fmt(c.goal)}</b></div>`;
+  const goal=(c,ctx)=>`<div class="sa-goal"><span>목표</span><b>${ctx.goalValue(c)}</b></div>`;
   const medal=(rank,ctx)=>`<div class="sa-medal sa-medal-${rank}" aria-label="전일 증가 ${rank}위">${ctx.M.icon(rank===1?'trophy':'star')}<b>${rank}</b></div>`;
   function podiumHero(c,ctx,rank,extra='') {
     return `<article data-channel="${c.id}" class="sa-hero ${state(c,ctx)} sa-rank-${rank} ${extra}">${ctx.M.confetti(c)}<div class="sa-hero-head">${medal(rank,ctx)}<div><span>전일 증가 ${rank}위</span><h3>${c.name}</h3></div>${ctx.M.badge(c)}</div><div class="sa-hero-main"><div class="sa-hero-numbers"><strong class="num">${ctx.fmt(c.current)}</strong>${ctx.change(c)}${parts(c,ctx)}${goal(c,ctx)}</div>${tower(c,ctx,rank)}</div>${ctx.M.reason(c)}</article>`;

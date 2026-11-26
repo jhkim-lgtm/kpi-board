@@ -12,7 +12,7 @@
       <div class="track-current num">${ctx.fmt(item.current)}</div>
       <div class="track-change">${ctx.change(item)}</div>
       <div class="track-graphic">${ctx.meter(item)}</div>
-      <div class="track-target"><strong class="num">${ctx.pct(item)}</strong><span>목표 ${ctx.fmt(item.goal)}명</span></div>
+      <div class="track-target"><strong class="num">${ctx.pct(item)}</strong><span>목표 ${ctx.goalValue(item)}${ctx.hasGoal(item)?'명':''}</span></div>
     </article>`;
     const group = (name, rows) => `<section class="track-group"><h2>${name}<span>${rows.length}개 채널</span></h2>${rows.map(row).join('')}</section>`;
     return `<div class="tracks-view">
@@ -27,13 +27,13 @@
       <div class="change-hero ${trendClass(item)}"><strong class="num">${changeValue(item, ctx.fmt)}</strong><span>${item.delta == null ? `${esc(item.period)} · 비교 없음` : `${esc(item.period)} · 명`}</span></div>
       <div class="change-follower"><span>팔로워</span><b class="num">${ctx.fmt(item.current)}</b></div>
       ${partLine(item, ctx.fmt)}
-      <div class="change-goal">${ctx.meter(item)}<div><span>목표 ${ctx.fmt(item.goal)}명</span><b class="num">${ctx.pct(item)}</b></div></div>
+      <div class="change-goal">${ctx.meter(item)}<div><span>목표 ${ctx.goalValue(item)}${ctx.hasGoal(item)?'명':''}</span><b class="num">${ctx.pct(item)}</b></div></div>
     </article>`;
     const agencyRow = (item) => `<article class="change-agency-row">
       <div class="change-agency-name"><h3>${esc(item.name)}</h3>${item.sub ? `<span>${esc(item.sub)}</span>` : ''}</div>
       <div class="change-agency-delta ${trendClass(item)}"><strong class="num">${changeValue(item, ctx.fmt)}</strong><span>${item.delta == null ? `${esc(item.period)} · 비교 없음` : `${esc(item.period)} · 명`}</span></div>
       <div class="change-agency-current"><strong class="num">${ctx.fmt(item.current)}</strong><span>팔로워</span></div>
-      <div class="change-agency-goal">${ctx.meter(item)}<span>목표 ${ctx.fmt(item.goal)}명 <b>${ctx.pct(item)}</b></span></div>
+      <div class="change-agency-goal">${ctx.meter(item)}<span>목표 ${ctx.goalValue(item)}${ctx.hasGoal(item)?'명':''} <b>${ctx.pct(item)}</b></span></div>
     </article>`;
     return `<div class="change-view">
       <section class="change-own"><div class="change-section-title"><h2>자사 매체</h2><span>팔로워 변화</span></div><div class="change-tiles">${ctx.own.map(tile).join('')}</div></section>

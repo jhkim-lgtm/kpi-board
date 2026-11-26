@@ -4,15 +4,16 @@
   const rankMap=ctx=>new Map(dailyWinners(ctx).map((c,i)=>[c.id,i+1]));
   const medal=n=>n?['','🥇','🥈','🥉'][n]:'';
   const delta=(ctx,c)=>`<div class="sb-delta ${c.delta>0?'sb-up':c.delta<0?'sb-down':'sb-flat'}"><strong>${ctx.signed(c.delta)}</strong><small>${c.period}</small></div>`;
-  const goal=(ctx,c)=>`<div class="sb-goal"><span>목표</span><b>${ctx.fmt(c.goal)}</b></div>`;
+  const goal=(ctx,c)=>`<div class="sb-goal"><span>목표</span><b>${ctx.goalValue(c)}</b></div>`;
   const parts=(ctx,c)=>`<div class="sb-parts">${ctx.parts(c)}</div>`;
   const reason=(ctx,c)=>`<div class="sb-reason">${ctx.M.reason(c)}</div>`;
   function chart(ctx,c,i=0){
+    if(!ctx.hasProgress(c))return ctx.goalMissing(c,'sb-tower-chart');
     return `<div class="sb-tower-chart ${state(ctx,c)}" role="meter" aria-label="${c.name} 현재 목표 진척" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${c.progress.toFixed(1)}" style="--level:${c.progress}%;--label-level:${Math.max(12,Math.min(88,c.progress))}%;--phase:${-i*.87}s"><div class="sb-tower-grid" aria-hidden="true">${Array.from({length:11},(_,j)=>`<i style="bottom:${j*10}%"><span>${j*10}</span></i>`).join('')}</div><div class="sb-tower-liquid"><i></i></div><div class="sb-tower-point"><i></i></div><b class="sb-level-value">${ctx.pct(c)}</b><div class="sb-rise" aria-hidden="true">${ctx.M.icon(c.id==='rr'?'car':'rocket')}</div></div>`;
   }
   function arena(ctx){
     const ranks=rankMap(ctx);
-    return `<div class="sb-arena"><div class="sb-section-head"><h3>목표를 향한 10개의 타워</h3><span>🥇🥈🥉 전일 증가 인원 상위 3개 · 월간 집계 제외</span></div><div class="sb-arena-floor" aria-hidden="true"></div><div class="sb-arena-towers">${ctx.all.map((c,i)=>{const rank=ranks.get(c.id)||0;return `<article data-channel="${c.id}" class="sb-arena-tower ${state(ctx,c)} sb-rank-${rank}" style="--rank:${rank}">${ctx.M.confetti(c)}<div class="sb-arena-name"><span>${rank?`${medal(rank)} 전일 증가 ${rank}위`:(c.group==='own'?'자사 매체':'운영대행')}</span><h3>${c.name}</h3></div><strong class="sb-value num">${ctx.fmt(c.current)}</strong>${delta(ctx,c)}${ctx.M.badge(c)}${chart(ctx,c,i)}${goal(ctx,c)}${parts(ctx,c)}${reason(ctx,c)}<div class="sb-pedestal" aria-hidden="true">${rank?medal(rank):'<i></i>'}</div></article>`;}).join('')}</div></div>`;
+    return `<div class="sb-arena"><div class="sb-section-head"><h3>목표를 향한 ${ctx.all.length}개 채널</h3><span>🥇🥈🥉 전일 증가 인원 상위 3개 · 월간 집계 제외</span></div><div class="sb-arena-floor" aria-hidden="true"></div><div class="sb-arena-towers">${ctx.all.map((c,i)=>{const rank=ranks.get(c.id)||0;return `<article data-channel="${c.id}" class="sb-arena-tower ${state(ctx,c)} sb-rank-${rank}" style="--rank:${rank}">${ctx.M.confetti(c)}<div class="sb-arena-name"><span>${rank?`${medal(rank)} 전일 증가 ${rank}위`:(c.group==='own'?'자사 매체':'운영대행')}</span><h3>${c.name}</h3></div><strong class="sb-value num">${ctx.fmt(c.current)}</strong>${delta(ctx,c)}${ctx.M.badge(c)}${chart(ctx,c,i)}${goal(ctx,c)}${parts(ctx,c)}${reason(ctx,c)}<div class="sb-pedestal" aria-hidden="true">${rank?medal(rank):'<i></i>'}</div></article>`;}).join('')}</div></div>`;
   }
   function flagName(c){
     const found=c.name.match(/^(\p{Regional_Indicator}{2}|🌏)\s*/u);

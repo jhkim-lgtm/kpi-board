@@ -6,21 +6,22 @@
   const state={demo:false,rule:'one-percent',motion:true,playing:false};
   try{const savedRule=localStorage.getItem('kpi-monitor-rule-v1');if(['one-percent','any-drop','three-days'].includes(savedRule))state.rule=savedRule;}catch{}
   document.getElementById('monitor-rule').value=state.rule;
-  const feedKeys={kr:'1club.kr',mfk:'myfirstkorea',jp:'1club.jp',rr:'rollsroycecarsseoul',plus:'pluskr_official',kef:'kef.korea',prov:'rollsroyceseoulprovenance',kakao:'rr_kakao',yt:'rr_youtube'};
+  const feedKeys={kr:'1club.kr',mfk:'myfirstkorea',jp:'1club.jp',rr:'rollsroycecarsseoul',plus:'pluskr_official',kef:'kef.korea',prov:'rollsroyceseoulprovenance',kakao:'rr_kakao',yt:'rr_youtube',theweekand:'theweekand_resort'};
   const status=c=>{
-    if(c.delta==null)return {key:'unknown',label:'비교 없음',icon:'alert'};
+    if(c.stale)return {key:'unknown',label:'이전 집계',icon:'alert'};
+    if(!Number.isFinite(c.current)||!Number.isFinite(c.delta))return {key:'unknown',label:'비교 대기',icon:'alert'};
     const prior=c.current-c.delta, drop=prior>0?-c.delta/prior:0;
     const emergency=c.period==='전일'&&c.delta<0&&(state.rule==='any-drop'||(state.rule==='three-days'?(c.declineDays||0)>=3:drop>=.01));
     if(emergency)return {key:'emergency',label:'비상',icon:'alert'};
     if(c.delta<0)return {key:'watch',label:'감소 확인',icon:'alert'};
-    if(c.current>=c.goal)return {key:'goal',label:'목표 달성',icon:'trophy'};
+    if(Number.isFinite(c.goal)&&c.goal>(c.baseline||0)&&c.current>=c.goal)return {key:'goal',label:'목표 달성',icon:'trophy'};
     if(c.delta>0)return {key:'growing',label:'성장 중',icon:'star'};
     return {key:'steady',label:'변동 없음',icon:'pause'};
   };
   const ruleLabel=()=>state.rule==='any-drop'?'전일 감소 = 비상':state.rule==='three-days'?'3일 연속 감소 = 비상':'전일 1% 이상 감소 = 비상';
   function make(ctx){
     const badge=c=>{const s=status(c);return `<span class="m-badge m-${s.key}">${icon(s.icon)}${s.label}</span>`;};
-    const bar=c=>`<div class="m-track m-${status(c).key}" role="meter" aria-label="${esc(c.name)} 현재 목표 진척" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${c.progress.toFixed(1)}"><div class="m-track-line"><div class="m-track-fill" style="width:${c.progress}%"></div><span class="m-traveler" aria-hidden="true">${icon(c.id==='rr'?'car':'rocket')}</span><b class="m-track-point" style="left:${c.progress}%" title="현재 ${ctx.pct(c)}"></b></div><div class="m-track-ticks" aria-hidden="true">${Array.from({length:11},(_,i)=>`<i${i%5===0?' class="major"':''}></i>`).join('')}</div><div class="m-track-meta"><b>현재 ${ctx.pct(c)}</b><span>목표 ${ctx.fmt(c.goal)}</span></div></div>`;
+    const bar=c=>!ctx.hasProgress(c)?ctx.goalMissing(c):`<div class="m-track m-${status(c).key}" role="meter" aria-label="${esc(c.name)} 현재 목표 진척" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${c.progress.toFixed(1)}"><div class="m-track-line"><div class="m-track-fill" style="width:${c.progress}%"></div><span class="m-traveler" aria-hidden="true">${icon(c.id==='rr'?'car':'rocket')}</span><b class="m-track-point" style="left:${c.progress}%" title="현재 ${ctx.pct(c)}"></b></div><div class="m-track-ticks" aria-hidden="true">${Array.from({length:11},(_,i)=>`<i${i%5===0?' class="major"':''}></i>`).join('')}</div><div class="m-track-meta"><b>현재 ${ctx.pct(c)}</b><span>목표 ${ctx.goalValue(c)}</span></div></div>`;
     const reason=c=>`<div class="m-reasons">${(c.id==='xhs'?[{key:'xhs_1club',name:'1%CLUB'},{key:'xhs_mfk',name:'MyFirstKorea'}]:[{key:c.id,name:c.name}]).map(r=>`<input class="m-reason" data-reason="${r.key}" aria-label="${esc(r.name)} 팔로우 이유" placeholder="${c.id==='xhs'?esc(r.name)+' · ':''}팔로우 이유 입력" maxlength="100">`).join('')}</div>`;
     const confetti=c=>{const s=status(c);if(!['goal','growing'].includes(s.key))return '';return `<span class="m-confetti ${s.key==='goal'?'m-party':'m-sparkles'}" aria-hidden="true">${Array.from({length:s.key==='goal'?12:4},(_,i)=>`<i style="--i:${i};--x:${(i*29+11)%100}%;--delay:${-(i%6)*.7}s">${s.key==='growing'?'✦':''}</i>`).join('')}</span>`;};
     const tile=(c,opt={})=>`<article class="m-card m-${status(c).key}${opt.compact?' m-compact':''}" data-channel="${c.id}">${confetti(c)}<div class="m-card-top"><h3>${c.name}</h3>${badge(c)}</div><strong class="m-value num">${ctx.fmt(c.current)}</strong><div class="m-change">${ctx.change(c)}</div>${ctx.parts(c)}${bar(c)}${opt.reason===false?'':reason(c)}</article>`;
